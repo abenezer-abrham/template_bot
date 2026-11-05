@@ -1,7 +1,8 @@
+import json
 from aiogram import Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery
-from bot.keyboards import main_menu
+from bot.keyboards import main_menu, booking_keyboard
 
 router = Router()
 
@@ -26,5 +27,24 @@ async def info(call: CallbackQuery):
 
 @router.callback_query(F.data == "book")
 async def book(call: CallbackQuery):
-    await call.message.answer("Booking is coming in the next step.")
+    await call.message.answer("Tap the button below to choose your time:",
+                              reply_markup=booking_keyboard())
     await call.answer()
+
+
+@router.message(F.web_app_data)
+async def got_booking(message: Message):
+    try:
+        data = json.loads(message.web_app_data.data)
+        service = data.get("service", "Service")
+        date = data.get("date", "Unknown date")
+        time = data.get("time", "Unknown time")
+        await message.answer(
+            f"Request received ✅\n{service} on {date} at {time}",
+            reply_markup=main_menu()
+        )
+    except Exception:
+        await message.answer(
+            "Request received ✅",
+            reply_markup=main_menu()
+        )
