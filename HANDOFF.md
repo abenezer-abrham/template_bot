@@ -1,13 +1,11 @@
-# Project: Botz
-Goal: Modular aiogram 3.x Telegram bot template for local business client sales (menus, bookings, FAQs, notifications)
-Stack: Python, aiogram 3.x, Telegram WebApp (HTML/JS)
+# Project: Botz - Streetwear & Thrift Boutique Template
+Goal: Automated Telegram showroom for second-hand, thrift, and boutique shoe/clothing shops (1-of-1 inventory, "Shop My Size" filter, instant claim/lock, live stock deduction, pickup vs delivery).
+Stack: Python, aiogram 3.x, Telegram WebApp (HTML/JS/CSS), SQLite
 Run: python main.py
 Done:
-- Created webapp/index.html with auto-date min limit and tg.close() on confirm
-- Added WEBAPP_URL to .env, .env.example, and config.py
-- Added booking_keyboard() with WebAppInfo in bot/keyboards.py
-- Updated bot/handlers/start.py with book callback and F.web_app_data receiver
-- Prepared standalone repository at ~/Documents/botz/salon-webapp ready for GitHub Pages
-Next: Push salon-webapp to GitHub and enable Pages, set real WEBAPP_URL in .env, then connect SQLite database for storing bookings
+- Initialized modular structure and Git repositories
+- Implemented core aiogram 3.x dispatcher with WebApp launcher and callback handlers
+- Finalized business pivot from salon to 1-of-1 boutique/second-hand retail
+Next: Build the Streetwear/Thrift WebApp UI (Grailed/StockX dark aesthetic, size filter tabs, 1-of-1 scarcity badges, 30-min claim button)
 Bugs: None
 Rules: short answers, don't rewrite working code, keep secrets out of markdown files
