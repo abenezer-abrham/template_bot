@@ -1,8 +1,9 @@
 import json
-from aiogram import Router, F
+from aiogram import Bot, Router, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, CallbackQuery
 from bot.keyboards import main_menu, showroom_keyboard
+from services.claim_service import handle_claim
 
 router = Router()
 
@@ -56,33 +57,24 @@ async def legacy_fallback(call: CallbackQuery):
 
 
 @router.message(F.web_app_data)
-async def got_claim(message: Message):
+async def got_claim(message: Message, bot: Bot):
     try:
         data = json.loads(message.web_app_data.data)
-        title = data.get("title", data.get("service", "1-of-1 Piece"))
-        brand = data.get("brand", "")
-        size = data.get("size", "One Size")
-        price = data.get("price", "TBD")
-        fulfillment = data.get("fulfillment", "pickup").capitalize()
-        contact = data.get("contact", "N/A")
+        item_id = data.get("item_id", "")
+        fulfillment = data.get("fulfillment", "pickup")
+        contact = data.get("contact", "").strip() or None
 
-        item_display = f"{brand} {title}".strip() if brand else title
-        fulfillment_display = "🏬 In-Store Pickup" if fulfillment.lower() == "pickup" else "🚚 Local Delivery"
-
-        text = (
-            f"✅ <b>1-of-1 Claim Reserved!</b>\n\n"
-            f"👕 <b>Piece:</b> {item_display}\n"
-            f"📏 <b>Size:</b> {size}\n"
-            f"💰 <b>Price:</b> {price}\n"
-            f"📦 <b>Fulfillment:</b> {fulfillment_display}\n"
-            f"📱 <b>Contact:</b> {contact}\n\n"
-            f"⏱️ <i>This item is locked for you for <b>30 minutes</b>. "
-            f"An admin will message you to confirm payment and dispatch!</i>"
+        success, reply_text = await handle_claim(
+            bot=bot,
+            tg_user_id=message.from_user.id,
+            tg_username=message.from_user.username,
+            item_id=item_id,
+            fulfillment=fulfillment,
+            contact=contact,
         )
-        await message.answer(text, reply_markup=main_menu())
+        await message.answer(reply_text, reply_markup=main_menu())
     except Exception:
         await message.answer(
             "✅ <b>Claim received!</b> Our team is reviewing your reservation.",
-            reply_markup=main_menu()
+            reply_markup=main_menu(),
         )
-
