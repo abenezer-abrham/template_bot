@@ -1,0 +1,11 @@
+{
+  "welcome": "Welcome to {business_name}! How can we help you today?",
+  "menu_book": "📅 Book Appointment",
+  "menu_services": "💼 Services & Prices",
+  "menu_hours": "🕒 Working Hours",
+  "menu_location": "📍 Location & Contact",
+  "menu_talk_owner": "💬 Talk to Owner",
+  "faq_services": "Our Services:\n1. Standard Service - $25\n2. Premium Service - $50",
+  "faq_hours": "Working Hours:\nMon - Sat: 09:00 - 18:00\nSunday: Closed",
+  "faq_location": "Location: 123 Business St, City\nPhone: +1 (555) 019-2834"
+}
