@@ -1,9 +1,10 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def main_menu_keyboard() -> ReplyKeyboardMarkup:
-    keyboard = [
-        [KeyboardButton(text="📅 Book"), KeyboardButton(text="💼 Services")],
-        [KeyboardButton(text="🕒 Hours"), KeyboardButton(text="📍 Location")]
-    ]
-    return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
+def main_menu():
+    kb = InlineKeyboardBuilder()
+    kb.button(text="📅 Book appointment", callback_data="book")
+    kb.button(text="💰 Prices", callback_data="prices")
+    kb.button(text="🕒 Hours & location", callback_data="info")
+    kb.adjust(1)
+    return kb.as_markup()

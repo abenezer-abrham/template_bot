@@ -1,22 +1,18 @@
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from config import BOT_TOKEN
-from bot.handlers.start import router as start_router
-
-logging.basicConfig(level=logging.INFO)
+from bot.handlers import start
 
 
 async def main():
-    if not BOT_TOKEN or BOT_TOKEN == "your_bot_token_here":
-        print("Error: Please set your BOT_TOKEN in .env")
-        return
-
-    bot = Bot(token=BOT_TOKEN)
+    logging.basicConfig(level=logging.INFO)
+    bot = Bot(BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher()
-
-    dp.include_router(start_router)
-
+    dp.include_router(start.router)
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
 
