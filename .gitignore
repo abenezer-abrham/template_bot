@@ -1,29 +1,8 @@
-# Environment variables
 .env
-
-# Database
 *.db
 *.sqlite
 *.sqlite3
-
-# Python bytecode & cache
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.pytest_cache/
-
-# Virtual environments
+*.pyc
 venv/
 .venv/
-env/
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db

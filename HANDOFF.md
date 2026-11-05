@@ -5,7 +5,9 @@ Run: python main.py
 Done:
 - Initialized isolated Git repository on main branch
 - Created project folder structure (bot/handlers, services, db, texts, deploy)
-- Added .gitignore, .env.example, requirements.txt, and PROJECT.md
-Next: Implement config.py and main.py entrypoint with /start menu and FAQ handler
+- Created main.py, config.py, .env, .env.example, .gitignore
+- Implemented bot/keyboards.py and bot/handlers/start.py with /start router
+- Mirrored structure to ~/Documents/botz/template_bot
+Next: Add bot token to .env and implement menu/FAQ response handlers
 Bugs: None
 Rules: short answers, don't rewrite working code, keep secrets out of markdown files
