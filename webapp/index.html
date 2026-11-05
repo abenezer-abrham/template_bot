@@ -3,735 +3,819 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>BOTZ // Streetwear & Thrift Showroom</title>
+  <title>BOTZ Archive</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    /* ── Design tokens ───────────────────────────────────── */
     :root {
-      --bg: #09090b;
-      --card-bg: #141417;
-      --card-hover: #1c1c21;
-      --border: #27272a;
-      --text: #fafafa;
-      --muted: #a1a1aa;
-      --accent: #22c55e;
-      --tag-bg: #27272a;
-      --badge-red: #ef4444;
-      --badge-orange: #f97316;
-      --badge-purple: #a855f7;
+      --ink:    #111010;
+      --faint:  #1a1815;
+      --card:   #201e1b;
+      --border: #2e2b27;
+      --smoke:  #3d3a36;
+      --warm:   #f4f0ea;
+      --muted:  #8a8480;
+      --gold:   #c9a96e;
+      --gold-d: #b8955a;
+      --red:    #c0624a;
+      --purple: #8e7ab5;
     }
 
-    * {
+    /* ── Reset ───────────────────────────────────────────── */
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
 
+    html { height: 100%; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 16px 16px 90px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Helvetica Neue", Arial, sans-serif;
+      background: var(--ink);
+      color: var(--warm);
+      min-height: 100%;
       line-height: 1.4;
+      overscroll-behavior: none;
     }
 
-    /* Header */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 14px;
+    /* ── Header ──────────────────────────────────────────── */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--ink);
       border-bottom: 1px solid var(--border);
-      margin-bottom: 16px;
+      padding: 14px 16px 0;
     }
 
-    .brand-title {
-      font-size: 19px;
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      text-transform: uppercase;
+    .header-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: space-between;
+      padding-bottom: 12px;
     }
 
-    .live-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 8px var(--accent);
-      animation: pulse 1.8s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.9); }
-    }
-
-    .drop-banner {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: rgba(34, 197, 94, 0.12);
-      border: 1px solid rgba(34, 197, 94, 0.25);
-      padding: 4px 8px;
-      border-radius: 4px;
-      letter-spacing: 0.05em;
-    }
-
-    /* Filter Bar */
-    .filter-section {
-      margin-bottom: 18px;
-    }
-
-    .filter-label {
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .filter-chips {
+    .brand {
       display: flex;
+      align-items: center;
       gap: 8px;
+    }
+
+    .brand-name {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--warm);
+    }
+
+    .live-pip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: breathe 2.4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .drop-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(201, 169, 110, 0.35);
+      padding: 3px 8px;
+      border-radius: 3px;
+    }
+
+    /* ── Size Filter ─────────────────────────────────────── */
+    .filter-wrap {
+      position: relative;
+      padding-bottom: 1px;
+    }
+
+    .filter-scroll {
+      display: flex;
+      gap: 0;
       overflow-x: auto;
       scrollbar-width: none;
-      padding-bottom: 4px;
     }
 
-    .filter-chips::-webkit-scrollbar {
-      display: none;
-    }
+    .filter-scroll::-webkit-scrollbar { display: none; }
 
-    .chip {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
+    .fchip {
+      flex-shrink: 0;
+      background: none;
+      border: none;
       color: var(--muted);
-      padding: 7px 14px;
-      border-radius: 6px;
       font-size: 13px;
       font-weight: 600;
-      white-space: nowrap;
+      padding: 10px 14px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      position: relative;
+      transition: color 0.18s ease;
+      white-space: nowrap;
     }
 
-    .chip.active {
-      background: var(--text);
-      color: var(--bg);
-      border-color: var(--text);
+    .fchip::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: translateX(-50%);
+      transition: width 0.2s ease;
     }
 
-    /* Product Grid */
-    .product-grid {
+    .fchip.active {
+      color: var(--warm);
+    }
+
+    .fchip.active::after {
+      width: calc(100% - 20px);
+    }
+
+    /* ── Main content ────────────────────────────────────── */
+    .content {
+      padding: 16px 12px 100px;
+    }
+
+    /* ── Stock counter ───────────────────────────────────── */
+    .stock-line {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .stock-line span {
+      color: var(--gold);
+    }
+
+    /* ── Product grid ────────────────────────────────────── */
+    .grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
-    @media (min-width: 600px) {
-      .product-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-
-    .product-card {
-      background: var(--card-bg);
+    /* ── Product card ────────────────────────────────────── */
+    .card {
+      background: var(--card);
       border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
-      position: relative;
-      cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease;
+      transition: transform 0.14s ease, border-color 0.14s ease;
+      will-change: transform;
     }
 
-    .product-card:active {
-      transform: scale(0.98);
-    }
+    .card:active { transform: scale(0.97); }
 
-    .product-img-wrap {
-      width: 100%;
-      height: 160px;
-      background: #18181b;
+    .card-img-wrap {
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      aspect-ratio: 3 / 4;
+      background: var(--faint);
       overflow: hidden;
     }
 
-    .product-img {
+    .card-img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
-    .scarcity-badge {
+    .card-img.loaded { opacity: 1; }
+
+    /* Gradient at bottom of image so text is readable */
+    .card-img-wrap::after {
+      content: '';
       position: absolute;
-      top: 8px;
-      left: 8px;
-      font-size: 10px;
+      inset: auto 0 0 0;
+      height: 55%;
+      background: linear-gradient(
+        to top,
+        rgba(17, 16, 16, 0.92) 0%,
+        rgba(17, 16, 16, 0.5)  40%,
+        transparent             100%
+      );
+      pointer-events: none;
+    }
+
+    .badge {
+      position: absolute;
+      top: 9px;
+      left: 9px;
+      z-index: 2;
+      font-size: 9px;
       font-weight: 800;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
       padding: 3px 6px;
       border-radius: 3px;
-      letter-spacing: 0.05em;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid;
     }
 
-    .scarcity-badge.one-of-one {
-      color: #f87171;
-      border-color: rgba(239, 68, 68, 0.4);
-    }
+    .badge.one-of-one { color: #c0624a; border-color: rgba(192, 98, 74, 0.4); background: rgba(192, 98, 74, 0.12); }
+    .badge.archive    { color: #c9a96e; border-color: rgba(201, 169, 110, 0.4); background: rgba(201, 169, 110, 0.12); }
+    .badge.grail      { color: #8e7ab5; border-color: rgba(142, 122, 181, 0.4); background: rgba(142, 122, 181, 0.12); }
 
-    .scarcity-badge.archive {
-      color: #fb923c;
-      border-color: rgba(249, 115, 22, 0.4);
-    }
-
-    .scarcity-badge.grail {
-      color: #c084fc;
-      border-color: rgba(168, 85, 247, 0.4);
-    }
-
-    .size-tag {
+    .img-size {
       position: absolute;
-      bottom: 8px;
-      right: 8px;
-      background: rgba(0, 0, 0, 0.85);
-      border: 1px solid var(--border);
-      font-size: 11px;
+      bottom: 50px;
+      left: 9px;
+      z-index: 2;
+      font-size: 10px;
       font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 4px;
-      text-transform: uppercase;
+      color: rgba(244, 240, 234, 0.75);
+      letter-spacing: 0.04em;
     }
 
-    .product-info {
-      padding: 10px;
+    .img-price {
+      position: absolute;
+      bottom: 32px;
+      left: 9px;
+      right: 9px;
+      z-index: 2;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--warm);
       display: flex;
-      flex-direction: column;
-      flex-grow: 1;
+      align-items: center;
       justify-content: space-between;
     }
 
-    .product-brand {
-      font-size: 11px;
-      font-weight: 700;
+    .claim-btn {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--muted);
-      letter-spacing: 0.04em;
-      margin-bottom: 2px;
+      background: var(--gold);
+      color: var(--ink);
+      border-radius: 3px;
+      padding: 4px 7px;
     }
 
-    .product-name {
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1.25;
-      margin-bottom: 6px;
-      color: var(--text);
+    .card-info {
+      padding: 10px 10px 11px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-brand {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .card-title {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--warm);
+      line-height: 1.3;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
-    .product-condition {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 8px;
+    /* ── Skeleton loading ────────────────────────────────── */
+    .skeleton-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
     }
 
-    .card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: auto;
-      padding-top: 6px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    .skeleton-img {
+      aspect-ratio: 3 / 4;
+      background: linear-gradient(90deg, var(--faint) 25%, var(--border) 50%, var(--faint) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
     }
 
-    .product-price {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--text);
+    .skeleton-text {
+      padding: 10px;
     }
 
-    .claim-pill {
-      font-size: 11px;
-      font-weight: 700;
-      background: var(--text);
-      color: var(--bg);
-      padding: 4px 8px;
+    .skeleton-line {
+      height: 10px;
       border-radius: 4px;
-      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--faint) 25%, var(--border) 50%, var(--faint) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      margin-bottom: 7px;
     }
 
-    /* Modal Sheet */
-    .modal-backdrop {
+    .skeleton-line.short { width: 60%; }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Empty state ─────────────────────────────────────── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 52px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--warm);
+      margin-bottom: 6px;
+    }
+
+    .empty-sub {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* ── Claim modal (bottom sheet) ──────────────────────── */
+    .overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(5px);
-      z-index: 100;
+      background: rgba(10, 9, 8, 0.78);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 50;
       align-items: flex-end;
-      justify-content: center;
     }
 
-    .modal-backdrop.open {
-      display: flex;
-    }
+    .overlay.open { display: flex; }
 
-    .modal-content {
-      background: #141417;
-      border: 1px solid var(--border);
-      border-top-left-radius: 18px;
-      border-top-right-radius: 18px;
+    .sheet {
+      background: var(--faint);
+      border-top: 1px solid var(--border);
+      border-radius: 18px 18px 0 0;
       width: 100%;
-      max-width: 500px;
-      padding: 20px;
-      max-height: 85vh;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0 20px 32px;
+      max-height: 90vh;
       overflow-y: auto;
-      animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: slideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
+      from { transform: translateY(100%); opacity: 0.6; }
+      to   { transform: translateY(0);    opacity: 1; }
     }
 
-    .modal-header {
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--smoke);
+      border-radius: 2px;
+      margin: 12px auto 20px;
+    }
+
+    .sheet-top {
       display: flex;
-      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
       align-items: flex-start;
-      margin-bottom: 14px;
     }
 
-    .modal-close {
-      background: var(--card-bg);
+    .sheet-img {
+      width: 76px;
+      height: 96px;
+      border-radius: 7px;
+      object-fit: cover;
+      background: var(--card);
+      flex-shrink: 0;
       border: 1px solid var(--border);
-      color: var(--text);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      cursor: pointer;
     }
 
-    .lock-banner {
-      background: rgba(249, 115, 22, 0.1);
-      border: 1px solid rgba(249, 115, 22, 0.3);
-      color: #fb923c;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .sheet-meta { flex: 1; }
 
-    .fulfillment-title {
-      font-size: 12px;
+    .sheet-brand {
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: 0.06em;
       color: var(--muted);
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
-    }
-
-    .option-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .opt-card {
-      border: 1px solid var(--border);
-      background: #18181b;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.15s ease;
-    }
-
-    .opt-card.selected {
-      border-color: var(--text);
-      background: #27272a;
-    }
-
-    .opt-card h4 {
-      font-size: 13px;
-      font-weight: 700;
       margin-bottom: 4px;
     }
 
-    .opt-card p {
+    .sheet-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--warm);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .sheet-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .stag {
       font-size: 11px;
+      font-weight: 600;
+      padding: 3px 7px;
+      border-radius: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
       color: var(--muted);
     }
+
+    .stag.price {
+      color: var(--warm);
+      font-weight: 800;
+      font-size: 14px;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    /* Lock notice */
+    .lock-notice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: rgba(201, 169, 110, 0.07);
+      border: 1px solid rgba(201, 169, 110, 0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .lock-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    .lock-notice b { color: var(--gold); font-weight: 700; }
+
+    /* Section label */
+    .slabel {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* Fulfillment options */
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .opt {
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 9px;
+      padding: 13px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+      text-align: left;
+    }
+
+    .opt.selected {
+      border-color: var(--gold);
+      background: rgba(201, 169, 110, 0.07);
+    }
+
+    .opt-icon { font-size: 18px; margin-bottom: 6px; display: block; }
+    .opt-title { font-size: 13px; font-weight: 700; color: var(--warm); margin-bottom: 2px; }
+    .opt-sub   { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+    /* Contact input */
+    .contact-wrap { margin-bottom: 22px; }
 
     .contact-input {
       width: 100%;
-      background: #18181b;
+      background: var(--card);
       border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px;
-      border-radius: 8px;
+      border-radius: 9px;
+      color: var(--warm);
       font-size: 14px;
-      margin-bottom: 16px;
+      padding: 12px 14px;
       outline: none;
+      transition: border-color 0.15s ease;
     }
 
-    .contact-input:focus {
-      border-color: var(--text);
-    }
+    .contact-input::placeholder { color: var(--smoke); }
+    .contact-input:focus { border-color: var(--gold); }
 
-    .modal-btn-confirm {
+    /* CTA button */
+    .cta {
       width: 100%;
-      background: var(--text);
-      color: var(--bg);
+      background: var(--gold);
+      color: var(--ink);
       border: none;
-      padding: 14px;
-      font-size: 15px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .modal-btn-confirm:active {
-      opacity: 0.9;
-    }
-
-    .empty-state {
-      grid-column: 1 / -1;
-      padding: 48px 16px;
-      text-align: center;
-      color: var(--muted);
+      border-radius: 9px;
+      padding: 15px;
       font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .cta:active {
+      background: var(--gold-d);
+      transform: scale(0.99);
     }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <div class="brand-title">
-        <span class="live-dot"></span>
-        BOTZ SHOWROOM
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-row">
+      <div class="brand">
+        <span class="live-pip"></span>
+        <span class="brand-name">Archive</span>
       </div>
-      <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">1-of-1 Streetwear & Vintage Archive</div>
+      <span class="drop-tag">Live Drop</span>
     </div>
-    <div class="drop-banner">Live Drop</div>
+    <!-- Size filter tabs -->
+    <div class="filter-wrap">
+      <div class="filter-scroll" id="filterRow">
+        <button class="fchip active" data-size="ALL">All</button>
+        <button class="fchip" data-size="S">S</button>
+        <button class="fchip" data-size="M">M</button>
+        <button class="fchip" data-size="L">L</button>
+        <button class="fchip" data-size="XL">XL</button>
+        <button class="fchip" data-size="US 9">US 9</button>
+        <button class="fchip" data-size="US 10">US 10</button>
+        <button class="fchip" data-size="US 11">US 11</button>
+      </div>
+    </div>
   </header>
 
-  <!-- Filter section: Shop My Size -->
-  <section class="filter-section">
-    <span class="filter-label">Shop My Size</span>
-    <div class="filter-chips" id="sizeFilters">
-      <button class="chip active" data-size="ALL">All Pieces</button>
-      <button class="chip" data-size="S">Size S</button>
-      <button class="chip" data-size="M">Size M</button>
-      <button class="chip" data-size="L">Size L</button>
-      <button class="chip" data-size="XL">Size XL</button>
-      <button class="chip" data-size="US 9">US 9</button>
-      <button class="chip" data-size="US 10">US 10</button>
-      <button class="chip" data-size="US 11">US 11</button>
-    </div>
-  </section>
+  <!-- Content -->
+  <main class="content">
+    <p class="stock-line" id="stockLine">Loading…</p>
+    <div class="grid" id="grid"></div>
+  </main>
 
-  <!-- Product Catalog -->
-  <div class="product-grid" id="productGrid"></div>
+  <!-- Claim sheet overlay -->
+  <div class="overlay" id="overlay">
+    <div class="sheet" id="sheet">
+      <div class="sheet-handle"></div>
 
-  <!-- Claim Modal -->
-  <div class="modal-backdrop" id="claimModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div>
-          <span id="modalBrand" style="font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 700;"></span>
-          <h2 id="modalTitle" style="font-size: 16px; font-weight: 700; margin-top: 2px;"></h2>
-          <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px;">
-            <span id="modalSize" style="font-size: 12px; font-weight: 700; background: var(--border); padding: 2px 6px; border-radius: 4px;"></span>
-            <span id="modalPrice" style="font-size: 16px; font-weight: 900; color: var(--text);"></span>
+      <div class="sheet-top">
+        <img class="sheet-img" id="sheetImg" src="" alt="">
+        <div class="sheet-meta">
+          <div class="sheet-brand" id="sheetBrand"></div>
+          <div class="sheet-title" id="sheetTitle"></div>
+          <div class="sheet-tags">
+            <span class="stag" id="sheetSize"></span>
+            <span class="stag price" id="sheetPrice"></span>
           </div>
         </div>
-        <button class="modal-close" id="modalClose">&times;</button>
       </div>
 
-      <div class="lock-banner">
-        <span>⏱️</span>
-        <span><b>30-Minute Hold:</b> Claiming locks this 1-of-1 piece so no one else can grab it while payment is finalized.</span>
+      <div class="lock-notice">
+        <span class="lock-icon">⏱</span>
+        <span><b>30-minute hold.</b> Claiming this locks it for you while you arrange payment. If not confirmed, it releases automatically.</span>
       </div>
 
-      <div class="fulfillment-title">Fulfillment Method</div>
-      <div class="option-grid">
-        <div class="opt-card selected" data-fulfillment="pickup" id="optPickup">
-          <h4>🏬 Store Pickup</h4>
-          <p>Collect at boutique (Free hold)</p>
+      <p class="slabel">Fulfillment</p>
+      <div class="options">
+        <div class="opt selected" id="optPickup" data-v="pickup">
+          <span class="opt-icon">🏬</span>
+          <div class="opt-title">Store Pickup</div>
+          <div class="opt-sub">Collect in boutique — free</div>
         </div>
-        <div class="opt-card" data-fulfillment="delivery" id="optDelivery">
-          <h4>🚚 Local Delivery</h4>
-          <p>Courier to your address</p>
+        <div class="opt" id="optDelivery" data-v="delivery">
+          <span class="opt-icon">🚚</span>
+          <div class="opt-title">Delivery</div>
+          <div class="opt-sub">Local courier to you</div>
         </div>
       </div>
 
-      <div class="fulfillment-title">Phone / Telegram Handle (Optional)</div>
-      <input type="text" id="contactInput" class="contact-input" placeholder="@handle or phone number">
+      <p class="slabel">Contact (optional)</p>
+      <div class="contact-wrap">
+        <input class="contact-input" id="contactInput"
+               type="text" placeholder="@handle or phone number">
+      </div>
 
-      <button class="modal-btn-confirm" id="btnConfirmClaim">Lock Item for 30 Min</button>
+      <button class="cta" id="ctaBtn">Lock — 30 min hold</button>
     </div>
   </div>
 
   <script>
-    // Initialize Telegram WebApp
+    /* ── Telegram WebApp init ─────────────────────────────── */
     const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
+    if (tg) { tg.ready(); tg.expand(); }
+
+    /* ── State ───────────────────────────────────────────── */
+    let items        = [];
+    let currentSize  = "ALL";
+    let activeItem   = null;
+    let fulfillment  = "pickup";
+
+    /* ── DOM refs ────────────────────────────────────────── */
+    const grid        = document.getElementById("grid");
+    const stockLine   = document.getElementById("stockLine");
+    const overlay     = document.getElementById("overlay");
+    const optPickup   = document.getElementById("optPickup");
+    const optDelivery = document.getElementById("optDelivery");
+    const ctaBtn      = document.getElementById("ctaBtn");
+
+    /* ── Skeletons while loading ─────────────────────────── */
+    function showSkeletons(n = 6) {
+      grid.innerHTML = Array.from({ length: n }, () => `
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text">
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </div>
+      `).join("");
     }
 
-    // Curated 1-of-1 inventory
-    const inventory = [
-      {
-        id: "botz-001",
-        brand: "Nike",
-        title: "Dunk Low Retro 'Panda'",
-        size: "US 10",
-        category: "shoes",
-        condition: "Deadstock (Brand New)",
-        price: "$115",
-        badge: "DEADSTOCK",
-        badgeClass: "one-of-one",
-        image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&q=80"
-      },
-      {
-        id: "botz-002",
-        brand: "Vintage 1994",
-        title: "Pink Floyd 'Division Bell' Tour Tee",
-        size: "L",
-        category: "tops",
-        condition: "Faded Vintage (9/10)",
-        price: "$140",
-        badge: "1-OF-1 VINTAGE",
-        badgeClass: "one-of-one",
-        image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80"
-      },
-      {
-        id: "botz-003",
-        brand: "Arc'teryx",
-        title: "Beta LT Gore-Tex Shell Jacket",
-        size: "M",
-        category: "outerwear",
-        condition: "Like New (9.5/10)",
-        price: "$320",
-        badge: "GRAIL",
-        badgeClass: "grail",
-        image: "https://images.unsplash.com/photo-1548883354-7622d03aca27?w=500&q=80"
-      },
-      {
-        id: "botz-004",
-        brand: "Stüssy",
-        title: "8-Ball Mohair Knit Sweater",
-        size: "L",
-        category: "tops",
-        condition: "Mint (9/10)",
-        price: "$185",
-        badge: "ARCHIVE",
-        badgeClass: "archive",
-        image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=500&q=80"
-      },
-      {
-        id: "botz-005",
-        brand: "Carhartt WIP",
-        title: "Detroit Jacket Blanket Lined",
-        size: "XL",
-        category: "outerwear",
-        condition: "Distressed Workwear (8.5/10)",
-        price: "$160",
-        badge: "1-OF-1",
-        badgeClass: "one-of-one",
-        image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&q=80"
-      },
-      {
-        id: "botz-006",
-        brand: "Air Jordan",
-        title: "Jordan 4 Retro 'Military Black'",
-        size: "US 11",
-        category: "shoes",
-        condition: "VNDS (9.5/10)",
-        price: "$290",
-        badge: "VERIFIED GRAIL",
-        badgeClass: "grail",
-        image: "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=500&q=80"
-      },
-      {
-        id: "botz-007",
-        brand: "Supreme",
-        title: "Box Logo Crewneck (FW22)",
-        size: "S",
-        category: "tops",
-        condition: "Excellent (9.5/10)",
-        price: "$210",
-        badge: "1-OF-1",
-        badgeClass: "archive",
-        image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500&q=80"
-      },
-      {
-        id: "botz-008",
-        brand: "New Balance",
-        title: "990v3 MiUSA Grey Classic",
-        size: "US 9",
-        category: "shoes",
-        condition: "Clean (9/10)",
-        price: "$135",
-        badge: "CLEAN PAIR",
-        badgeClass: "one-of-one",
-        image: "https://images.unsplash.com/photo-1539185441755-769473a23570?w=500&q=80"
+    /* ── Fetch live inventory from API ───────────────────── */
+    async function loadItems(size = "ALL") {
+      showSkeletons();
+      stockLine.textContent = "Loading…";
+      try {
+        const res  = await fetch(`/api/items?size=${encodeURIComponent(size)}`);
+        const data = await res.json();
+        items = data;
+        renderItems();
+      } catch (err) {
+        grid.innerHTML = `
+          <div class="empty" style="grid-column:1/-1">
+            <div class="empty-icon">📡</div>
+            <div class="empty-title">Couldn't load inventory</div>
+            <div class="empty-sub">Check your connection and try again.</div>
+          </div>`;
+        stockLine.textContent = "";
       }
-    ];
+    }
 
-    let currentFilter = "ALL";
-    let selectedItem = null;
-    let selectedFulfillment = "pickup";
+    /* ── Render cards ────────────────────────────────────── */
+    function renderItems() {
+      const count = items.length;
+      stockLine.innerHTML = count > 0
+        ? `<span>${count}</span> piece${count !== 1 ? "s" : ""} available`
+        : "";
 
-    const productGrid = document.getElementById("productGrid");
-    const claimModal = document.getElementById("claimModal");
-    const modalClose = document.getElementById("modalClose");
-    const optPickup = document.getElementById("optPickup");
-    const optDelivery = document.getElementById("optDelivery");
-    const btnConfirmClaim = document.getElementById("btnConfirmClaim");
-
-    function renderProducts() {
-      productGrid.innerHTML = "";
-      const filtered = inventory.filter(item => {
-        if (currentFilter === "ALL") return true;
-        return item.size === currentFilter;
-      });
-
-      if (filtered.length === 0) {
-        productGrid.innerHTML = `
-          <div class="empty-state">
-            <p>No 1-of-1 pieces found for size <b>${currentFilter}</b>.</p>
-            <p style="font-size: 12px; margin-top: 6px;">Check back next drop or switch size filters above.</p>
-          </div>
-        `;
+      if (count === 0) {
+        grid.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">🕵️</div>
+            <div class="empty-title">Nothing in this size right now</div>
+            <div class="empty-sub">New drops land every Friday.<br>Try another size or check back soon.</div>
+          </div>`;
         return;
       }
 
-      filtered.forEach(item => {
+      grid.innerHTML = "";
+      items.forEach(item => {
         const card = document.createElement("div");
-        card.className = "product-card";
+        card.className = "card";
         card.innerHTML = `
-          <div class="product-img-wrap">
-            <img class="product-img" src="${item.image}" alt="${item.title}" loading="lazy">
-            <span class="scarcity-badge ${item.badgeClass}">${item.badge}</span>
-            <span class="size-tag">${item.size}</span>
+          <div class="card-img-wrap">
+            <img class="card-img" data-src="${item.image_url || ""}" alt="${item.title}">
+            <span class="badge ${item.badge_class}">${item.badge}</span>
+            <span class="img-size">${item.size}</span>
+            <div class="img-price">
+              <span>${item.price}</span>
+              <span class="claim-btn">Claim</span>
+            </div>
           </div>
-          <div class="product-info">
-            <div>
-              <div class="product-brand">${item.brand}</div>
-              <div class="product-name">${item.title}</div>
-              <div class="product-condition">${item.condition}</div>
-            </div>
-            <div class="card-footer">
-              <span class="product-price">${item.price}</span>
-              <span class="claim-pill">Claim</span>
-            </div>
+          <div class="card-info">
+            <div class="card-brand">${item.brand}</div>
+            <div class="card-title">${item.title}</div>
           </div>
         `;
+        // Lazy-load image
+        const img = card.querySelector(".card-img");
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(e => {
+            if (e.isIntersecting) {
+              img.src = img.dataset.src;
+              img.addEventListener("load", () => img.classList.add("loaded"), { once: true });
+              observer.disconnect();
+            }
+          });
+        }, { rootMargin: "80px" });
+        observer.observe(img);
 
-        card.addEventListener("click", () => openClaimModal(item));
-        productGrid.appendChild(card);
+        card.addEventListener("click", () => openSheet(item));
+        grid.appendChild(card);
       });
     }
 
-    // Size filter tab handlers
-    document.getElementById("sizeFilters").addEventListener("click", (e) => {
-      const chip = e.target.closest(".chip");
+    /* ── Size filter ─────────────────────────────────────── */
+    document.getElementById("filterRow").addEventListener("click", e => {
+      const chip = e.target.closest(".fchip");
       if (!chip) return;
-      document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      document.querySelectorAll(".fchip").forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
-      currentFilter = chip.dataset.size;
-      renderProducts();
+      currentSize = chip.dataset.size;
+      loadItems(currentSize);
     });
 
-    // Modal controls
-    function openClaimModal(item) {
-      selectedItem = item;
-      document.getElementById("modalBrand").innerText = item.brand;
-      document.getElementById("modalTitle").innerText = item.title;
-      document.getElementById("modalSize").innerText = `SIZE: ${item.size}`;
-      document.getElementById("modalPrice").innerText = item.price;
-      claimModal.classList.add("open");
+    /* ── Claim sheet ─────────────────────────────────────── */
+    function openSheet(item) {
+      activeItem = item;
+      document.getElementById("sheetImg").src    = item.image_url || "";
+      document.getElementById("sheetBrand").textContent = item.brand;
+      document.getElementById("sheetTitle").textContent = item.title;
+      document.getElementById("sheetSize").textContent  = item.size;
+      document.getElementById("sheetPrice").textContent = item.price;
+      document.getElementById("contactInput").value     = "";
+      setFulfillment("pickup");
+      overlay.classList.add("open");
     }
 
-    function closeClaimModal() {
-      claimModal.classList.remove("open");
-      selectedItem = null;
+    function closeSheet() {
+      overlay.classList.remove("open");
+      activeItem = null;
     }
 
-    modalClose.addEventListener("click", closeClaimModal);
-    claimModal.addEventListener("click", (e) => {
-      if (e.target === claimModal) closeClaimModal();
+    overlay.addEventListener("click", e => {
+      if (e.target === overlay) closeSheet();
     });
 
-    // Fulfillment toggle
-    optPickup.addEventListener("click", () => {
-      selectedFulfillment = "pickup";
-      optPickup.classList.add("selected");
-      optDelivery.classList.remove("selected");
-    });
+    function setFulfillment(val) {
+      fulfillment = val;
+      optPickup.classList.toggle("selected",   val === "pickup");
+      optDelivery.classList.toggle("selected", val === "delivery");
+    }
 
-    optDelivery.addEventListener("click", () => {
-      selectedFulfillment = "delivery";
-      optDelivery.classList.add("selected");
-      optPickup.classList.remove("selected");
-    });
+    optPickup.addEventListener("click",   () => setFulfillment("pickup"));
+    optDelivery.addEventListener("click", () => setFulfillment("delivery"));
 
-    // Confirm Claim & send data back to Bot
-    btnConfirmClaim.addEventListener("click", () => {
-      if (!selectedItem) return;
+    /* ── Confirm claim ───────────────────────────────────── */
+    ctaBtn.addEventListener("click", () => {
+      if (!activeItem) return;
 
       const payload = {
-        action: "claim_item",
-        item_id: selectedItem.id,
-        brand: selectedItem.brand,
-        title: selectedItem.title,
-        size: selectedItem.size,
-        price: selectedItem.price,
-        fulfillment: selectedFulfillment,
-        contact: document.getElementById("contactInput").value.trim() || "N/A",
-        timestamp: new Date().toISOString()
+        action:      "claim_item",
+        item_id:     activeItem.id,
+        brand:       activeItem.brand,
+        title:       activeItem.title,
+        size:        activeItem.size,
+        price:       activeItem.price,
+        badge_class: activeItem.badge_class,
+        fulfillment: fulfillment,
+        contact:     document.getElementById("contactInput").value.trim() || null,
+        timestamp:   new Date().toISOString(),
       };
 
       if (tg && typeof tg.sendData === "function") {
         tg.sendData(JSON.stringify(payload));
         tg.close();
       } else {
-        alert(`[Demo Mode] Item Claimed!\n\n${selectedItem.title} (${selectedItem.size})\nPrice: ${selectedItem.price}\nFulfillment: ${selectedFulfillment.toUpperCase()}\n\n30-minute hold initiated.`);
-        closeClaimModal();
+        // Browser demo mode
+        alert(
+          `✅ Claim confirmed!\n\n` +
+          `${activeItem.brand} — ${activeItem.title}\n` +
+          `Size: ${activeItem.size}  ·  ${activeItem.price}\n` +
+          `Fulfillment: ${fulfillment === "pickup" ? "Store Pickup" : "Local Delivery"}\n\n` +
+          `30-minute hold is active.`
+        );
+        closeSheet();
       }
     });
 
-    // Initial render
-    renderProducts();
+    /* ── Boot ────────────────────────────────────────────── */
+    loadItems();
   </script>
 </body>
 </html>

@@ -1,16 +1,25 @@
 """
-Database layer: schema init and CRUD for items & claims.
+Database layer — asyncpg (Supabase / PostgreSQL).
+One connection pool, shared across the bot and API server.
 """
-import aiosqlite
-from pathlib import Path
+import asyncpg
+from config import DATABASE_URL
 
-DB_PATH = Path(__file__).parent.parent / "botz.db"
+_pool: asyncpg.Pool | None = None
+
+
+async def get_pool() -> asyncpg.Pool:
+    global _pool
+    if _pool is None:
+        _pool = await asyncpg.create_pool(DATABASE_URL, min_size=2, max_size=10)
+    return _pool
 
 
 async def init_db() -> None:
     """Create tables if they don't exist."""
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute("""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute("""
             CREATE TABLE IF NOT EXISTS items (
                 id          TEXT PRIMARY KEY,
                 brand       TEXT NOT NULL,
@@ -20,84 +29,88 @@ async def init_db() -> None:
                 badge       TEXT NOT NULL,
                 badge_class TEXT NOT NULL,
                 image_url   TEXT,
-                available   INTEGER NOT NULL DEFAULT 1,  -- 1=in stock, 0=sold
-                created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+                available   BOOLEAN NOT NULL DEFAULT TRUE,
+                created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
             )
         """)
-        await db.execute("""
+        await conn.execute("""
             CREATE TABLE IF NOT EXISTS claims (
-                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                id           SERIAL PRIMARY KEY,
                 item_id      TEXT NOT NULL REFERENCES items(id),
-                tg_user_id   INTEGER NOT NULL,
+                tg_user_id   BIGINT NOT NULL,
                 tg_username  TEXT,
-                fulfillment  TEXT NOT NULL DEFAULT 'pickup',  -- 'pickup' | 'delivery'
+                fulfillment  TEXT NOT NULL DEFAULT 'pickup',
                 contact      TEXT,
-                status       TEXT NOT NULL DEFAULT 'pending', -- 'pending'|'paid'|'expired'
-                claimed_at   TEXT NOT NULL DEFAULT (datetime('now')),
-                expires_at   TEXT NOT NULL DEFAULT (datetime('now', '+30 minutes')),
-                completed_at TEXT
+                status       TEXT NOT NULL DEFAULT 'pending',
+                claimed_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                expires_at   TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '30 minutes'),
+                completed_at TIMESTAMPTZ
             )
         """)
-        await db.execute(
+        await conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_claims_item ON claims(item_id)"
         )
-        await db.execute(
+        await conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_claims_expires ON claims(expires_at)"
         )
-        await db.commit()
 
 
 # ── Items ────────────────────────────────────────────────────────────────────
 
 async def seed_items(items: list[dict]) -> None:
-    """Insert items that don't exist yet (safe to call on every startup)."""
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.executemany(
+    """Insert items that don't exist yet. Safe to call on every startup."""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.executemany(
             """
-            INSERT OR IGNORE INTO items
-                (id, brand, title, size, price, badge, badge_class, image_url)
-            VALUES
-                (:id, :brand, :title, :size, :price, :badge, :badge_class, :image)
+            INSERT INTO items (id, brand, title, size, price, badge, badge_class, image_url)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            ON CONFLICT (id) DO NOTHING
             """,
-            items,
+            [
+                (
+                    i["id"], i["brand"], i["title"], i["size"],
+                    i["price"], i["badge"], i["badge_class"], i.get("image"),
+                )
+                for i in items
+            ],
         )
-        await db.commit()
 
 
 async def get_available_items(size: str | None = None) -> list[dict]:
-    """Fetch items that are in-stock (available=1) and not actively claimed."""
+    """
+    Return items that are in stock and not currently locked by an active claim.
+    """
+    pool = await get_pool()
     sql = """
         SELECT i.*
         FROM items i
-        WHERE i.available = 1
+        WHERE i.available = TRUE
           AND NOT EXISTS (
               SELECT 1 FROM claims c
               WHERE c.item_id = i.id
                 AND c.status = 'pending'
-                AND c.expires_at > datetime('now')
+                AND c.expires_at > NOW()
           )
     """
-    params: list = []
+    args: list = []
     if size and size != "ALL":
-        sql += " AND i.size = ?"
-        params.append(size)
+        sql += " AND i.size = $1"
+        args.append(size)
     sql += " ORDER BY i.created_at DESC"
 
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        async with db.execute(sql, params) as cur:
-            rows = await cur.fetchall()
-            return [dict(r) for r in rows]
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(sql, *args)
+        return [dict(r) for r in rows]
 
 
 async def get_item(item_id: str) -> dict | None:
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        async with db.execute(
-            "SELECT * FROM items WHERE id = ?", (item_id,)
-        ) as cur:
-            row = await cur.fetchone()
-            return dict(row) if row else None
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT * FROM items WHERE id = $1", item_id
+        )
+        return dict(row) if row else None
 
 
 # ── Claims ───────────────────────────────────────────────────────────────────
@@ -110,94 +123,72 @@ async def create_claim(
     contact: str | None,
 ) -> int | None:
     """
-    Attempt to create a 30-minute claim.
-    Returns the new claim id, or None if item is already locked/sold.
+    Atomically lock an item for 30 minutes.
+    Returns the claim id or None if already locked / sold.
     """
-    async with aiosqlite.connect(DB_PATH) as db:
-        # Atomically check + insert
-        async with db.execute(
-            """
-            SELECT 1 FROM items i
-            WHERE i.id = ?
-              AND i.available = 1
-              AND NOT EXISTS (
-                  SELECT 1 FROM claims c
-                  WHERE c.item_id = i.id
-                    AND c.status = 'pending'
-                    AND c.expires_at > datetime('now')
-              )
-            """,
-            (item_id,),
-        ) as cur:
-            if not await cur.fetchone():
-                return None  # already locked or sold
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            # Lock-check inside transaction
+            available = await conn.fetchval(
+                """
+                SELECT TRUE FROM items i
+                WHERE i.id = $1
+                  AND i.available = TRUE
+                  AND NOT EXISTS (
+                      SELECT 1 FROM claims c
+                      WHERE c.item_id = i.id
+                        AND c.status = 'pending'
+                        AND c.expires_at > NOW()
+                  )
+                FOR UPDATE
+                """,
+                item_id,
+            )
+            if not available:
+                return None
 
-        await db.execute(
-            """
-            INSERT INTO claims (item_id, tg_user_id, tg_username, fulfillment, contact)
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (item_id, tg_user_id, tg_username, fulfillment, contact),
-        )
-        await db.commit()
-
-        async with db.execute("SELECT last_insert_rowid()") as cur:
-            row = await cur.fetchone()
-            return row[0] if row else None
-
-
-async def get_active_claim(item_id: str) -> dict | None:
-    """Return the current pending (non-expired) claim for an item."""
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        async with db.execute(
-            """
-            SELECT * FROM claims
-            WHERE item_id = ?
-              AND status = 'pending'
-              AND expires_at > datetime('now')
-            ORDER BY claimed_at DESC LIMIT 1
-            """,
-            (item_id,),
-        ) as cur:
-            row = await cur.fetchone()
-            return dict(row) if row else None
+            claim_id = await conn.fetchval(
+                """
+                INSERT INTO claims (item_id, tg_user_id, tg_username, fulfillment, contact)
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING id
+                """,
+                item_id, tg_user_id, tg_username, fulfillment, contact,
+            )
+            return claim_id
 
 
-async def mark_claim_paid(claim_id: int) -> None:
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute(
-            """
-            UPDATE claims
-            SET status = 'paid', completed_at = datetime('now')
-            WHERE id = ?
-            """,
-            (claim_id,),
-        )
-        # Mark item as sold
-        await db.execute(
-            """
-            UPDATE items SET available = 0
-            WHERE id = (SELECT item_id FROM claims WHERE id = ?)
-            """,
-            (claim_id,),
-        )
-        await db.commit()
+async def mark_claim_paid(claim_id: int) -> bool:
+    """Mark claim paid and item sold. Returns True on success."""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            item_id = await conn.fetchval(
+                "SELECT item_id FROM claims WHERE id = $1 AND status = 'pending'",
+                claim_id,
+            )
+            if not item_id:
+                return False
+            await conn.execute(
+                "UPDATE claims SET status='paid', completed_at=NOW() WHERE id=$1",
+                claim_id,
+            )
+            await conn.execute(
+                "UPDATE items SET available=FALSE WHERE id=$1", item_id
+            )
+            return True
 
 
 async def expire_stale_claims() -> int:
-    """
-    Flip all timed-out pending claims to 'expired'.
-    Returns the number of rows updated.
-    """
-    async with aiosqlite.connect(DB_PATH) as db:
-        cur = await db.execute(
+    """Expire all timed-out pending claims. Returns count."""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        result = await conn.execute(
             """
             UPDATE claims
-            SET status = 'expired', completed_at = datetime('now')
-            WHERE status = 'pending'
-              AND expires_at <= datetime('now')
+            SET status = 'expired', completed_at = NOW()
+            WHERE status = 'pending' AND expires_at <= NOW()
             """
         )
-        await db.commit()
-        return cur.rowcount
+        return int(result.split()[-1])  # "UPDATE N"
