@@ -58,7 +58,6 @@ async def init_db() -> None:
 # ── Items ────────────────────────────────────────────────────────────────────
 
 async def seed_items(items: list[dict]) -> None:
-    """Insert items that don't exist yet. Safe to call on every startup."""
     pool = await get_pool()
     async with pool.acquire() as conn:
         await conn.executemany(
@@ -78,9 +77,6 @@ async def seed_items(items: list[dict]) -> None:
 
 
 async def get_available_items(size: str | None = None) -> list[dict]:
-    """
-    Return items that are in stock and not currently locked by an active claim.
-    """
     pool = await get_pool()
     sql = """
         SELECT i.*
@@ -113,7 +109,48 @@ async def get_item(item_id: str) -> dict | None:
         return dict(row) if row else None
 
 
-# ── Claims ───────────────────────────────────────────────────────────────────
+async def get_all_items_stock() -> list[dict]:
+    """Return all items with live status for admin /stock view."""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("""
+            SELECT
+                i.id, i.brand, i.title, i.size, i.price, i.available,
+                c.id        AS claim_id,
+                c.tg_username,
+                c.fulfillment,
+                c.status    AS claim_status,
+                c.expires_at
+            FROM items i
+            LEFT JOIN LATERAL (
+                SELECT * FROM claims
+                WHERE item_id = i.id
+                  AND status = 'pending'
+                  AND expires_at > NOW()
+                ORDER BY claimed_at DESC LIMIT 1
+            ) c ON TRUE
+            ORDER BY i.created_at DESC
+        """)
+        return [dict(r) for r in rows]
+
+
+async def add_item(item: dict) -> None:
+    """Insert a new item (admin /add_item)."""
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """
+            INSERT INTO items (id, brand, title, size, price, badge, badge_class, image_url)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            ON CONFLICT (id) DO NOTHING
+            """,
+            item["id"], item["brand"], item["title"], item["size"],
+            item["price"], item["badge"], item.get("badge_class", "one-of-one"),
+            item.get("image_url"),
+        )
+
+
+# ── Claims ────────────────────────────────────────────────────────────────────
 
 async def create_claim(
     item_id: str,
@@ -122,14 +159,9 @@ async def create_claim(
     fulfillment: str,
     contact: str | None,
 ) -> int | None:
-    """
-    Atomically lock an item for 30 minutes.
-    Returns the claim id or None if already locked / sold.
-    """
     pool = await get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
-            # Lock-check inside transaction
             available = await conn.fetchval(
                 """
                 SELECT TRUE FROM items i
@@ -159,8 +191,16 @@ async def create_claim(
             return claim_id
 
 
+async def get_claim(claim_id: int) -> dict | None:
+    pool = await get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT * FROM claims WHERE id = $1", claim_id
+        )
+        return dict(row) if row else None
+
+
 async def mark_claim_paid(claim_id: int) -> bool:
-    """Mark claim paid and item sold. Returns True on success."""
     pool = await get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
@@ -181,7 +221,6 @@ async def mark_claim_paid(claim_id: int) -> bool:
 
 
 async def expire_stale_claims() -> int:
-    """Expire all timed-out pending claims. Returns count."""
     pool = await get_pool()
     async with pool.acquire() as conn:
         result = await conn.execute(
@@ -191,4 +230,4 @@ async def expire_stale_claims() -> int:
             WHERE status = 'pending' AND expires_at <= NOW()
             """
         )
-        return int(result.split()[-1])  # "UPDATE N"
+        return int(result.split()[-1])

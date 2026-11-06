@@ -4,15 +4,16 @@ Stack: Python, aiogram 3.x, Telegram WebApp (HTML/JS/CSS), FastAPI, asyncpg, Sup
 Run: python main.py
 Done:
 - Initialized modular structure and Git repositories
-- Implemented core aiogram 3.x dispatcher with WebApp launcher and callback handlers
 - Established 1-of-1 boutique/second-hand retail as the core product model
-- Built Streetwear/Thrift WebApp UI (Grailed/StockX dark aesthetic, "Shop My Size" filter tabs, 1-of-1 scarcity badges, 30-min claim modal with pickup vs delivery)
-- Updated bot handlers and keyboards to handle showroom navigation and 30-min claim order confirmations
-- Added SQLite-first DB layer, then upgraded to asyncpg / Supabase PostgreSQL
-- Added FastAPI server (port 8000) serving live /api/items + webapp static files
-- Full UI redesign: warm editorial dark aesthetic, lazy-load images, live fetch from API, smooth bottom sheet, skeleton loading
-- schema.sql in db/ — run once in Supabase SQL Editor to initialize tables + seed
-Next: Admin bot commands — /mark_paid <claim_id>, /stock (live inventory table), /expire (flush stale claims)
+- Built Streetwear/Thrift WebApp UI (warm editorial dark aesthetic, Shop My Size filters, 1-of-1 badges, 30-min claim modal, pickup vs delivery, GitHub Pages static fallback)
+- Bot handlers and keyboards for showroom navigation and 30-min claim confirmation
+- Supabase/asyncpg DB layer: items + claims tables, atomic lock check, expiry
+- FastAPI server (port 8000): serves /api/items + webapp static files
+- APScheduler: auto-expires stale claims every 5 minutes
+- schema.sql: run once in Supabase SQL Editor to initialize + seed
+- Admin commands: /stock (live table), /mark_paid <id>, /expire (manual flush), /add_item (FSM guided add)
+- Pushed to GitHub: https://github.com/abenezer-abrham/template_bot
+Next: Set ADMIN_ID in .env, enable GitHub Pages on repo (Settings → Pages → main /docs), connect Supabase DATABASE_URL
 Bugs: None
 Rules: short answers, don't rewrite working code, keep secrets out of markdown files
 

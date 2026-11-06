@@ -4,9 +4,10 @@ import uvicorn
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from config import BOT_TOKEN, API_HOST, API_PORT
-from bot.handlers import start
+from bot.handlers import start, admin
 from db.database import init_db, seed_items
 from db.seed_data import INVENTORY
 from services.claim_service import run_expiry_pass
@@ -27,12 +28,14 @@ async def main():
     scheduler.add_job(run_expiry_pass, "interval", minutes=5)
     scheduler.start()
 
-    # Bot dispatcher
-    dp = Dispatcher()
+    # Dispatcher with FSM storage (for /add_item conversation)
+    dp = Dispatcher(storage=MemoryStorage())
+    dp.include_router(admin.router)   # admin first (more specific filters)
     dp.include_router(start.router)
+
     await bot.delete_webhook(drop_pending_updates=True)
 
-    # FastAPI (runs alongside the bot in the same event loop)
+    # FastAPI runs alongside bot in the same event loop
     api_config = uvicorn.Config(
         fastapi_app,
         host=API_HOST,
