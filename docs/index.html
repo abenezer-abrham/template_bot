@@ -1,30 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="am">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>Boutique Showroom // All Departments</title>
+  <title>ቦቲካ ሾውሩም // Boutique Showroom</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    /* ── Light Retail Palette (Amazon / ASOS inspired) ─────────────── */
+    /* ── Clean Light Retail Palette (High-Performance, Low-RAM) ───── */
     :root {
       --bg: #f8f9fa;
       --card-bg: #ffffff;
-      --card-border: #e5e7eb;
-      --card-hover: #f3f4f6;
+      --card-border: #e2e8f0;
       --text: #0f172a;
       --text-muted: #64748b;
-      --text-subtle: #94a3b8;
       --amber: #f59e0b;
       --amber-dark: #d97706;
       --amber-light: #fef3c7;
-      --primary: #2563eb;
       --green: #10b981;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --radius-sm: 6px;
-      --radius-md: 10px;
-      --radius-lg: 16px;
+      --telebirr: #0088cc;
+      --radius: 8px;
     }
 
     * {
@@ -35,114 +29,94 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Ethiopic", "Nyala", sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      line-height: 1.45;
-      padding-bottom: 90px;
+      line-height: 1.4;
+      padding-bottom: 80px;
     }
 
-    /* ── Sticky Navigation Bar ───────────────────────────────────────── */
+    /* ── Header & Language Switcher ───────────────────────────────── */
     .top-nav {
       position: sticky;
       top: 0;
       z-index: 30;
       background: #ffffff;
       border-bottom: 1px solid var(--card-border);
-      box-shadow: var(--shadow-sm);
-      padding: 12px 16px 8px;
+      padding: 10px 14px 6px;
     }
 
     .nav-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
-    .brand-logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 17px;
+    .brand-title {
+      font-size: 16px;
       font-weight: 900;
       letter-spacing: -0.02em;
       text-transform: uppercase;
-      color: var(--text);
-    }
-
-    .live-status {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--green);
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      padding: 3px 8px;
+      gap: 6px;
+    }
+
+    .lang-toggle-btn {
+      background: #f1f5f9;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
       border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 6px var(--green);
-      animation: pulse 1.8s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(0.8); opacity: 0.5; }
-    }
-
-    /* ── Search Bar ─────────────────────────────────────────────────── */
+    /* ── Fast Search ─────────────────────────────────────────────── */
     .search-box {
       position: relative;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .search-input {
       width: 100%;
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
-      border-radius: var(--radius-sm);
-      padding: 10px 14px 10px 38px;
-      font-size: 14px;
+      border-radius: var(--radius);
+      padding: 9px 12px 9px 34px;
+      font-size: 13.5px;
       color: var(--text);
       outline: none;
-      transition: all 0.15s ease;
     }
 
     .search-input:focus {
       background: #ffffff;
       border-color: var(--amber-dark);
-      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
     }
 
     .search-icon {
       position: absolute;
-      left: 12px;
+      left: 10px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-muted);
       pointer-events: none;
     }
 
-    /* ── Department Tabs (Horizontal Carousel) ───────────────────────── */
+    /* ── Department Carousel ─────────────────────────────────────── */
     .dept-scroll {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       overflow-x: auto;
       scrollbar-width: none;
-      padding-bottom: 4px;
+      padding-bottom: 2px;
     }
-
     .dept-scroll::-webkit-scrollbar { display: none; }
 
     .dept-pill {
@@ -150,62 +124,49 @@
       background: #ffffff;
       border: 1px solid var(--card-border);
       color: var(--text-muted);
-      padding: 7px 13px;
-      border-radius: 20px;
-      font-size: 12.5px;
+      padding: 6px 11px;
+      border-radius: 18px;
+      font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
       white-space: nowrap;
-    }
-
-    .dept-pill:hover {
-      border-color: #94a3b8;
     }
 
     .dept-pill.active {
       background: var(--text);
       color: #ffffff;
       border-color: var(--text);
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
     }
 
-    /* ── Size Quick Filter Bar ───────────────────────────────────────── */
+    /* ── Secondary Size Filter ───────────────────────────────────── */
     .size-filter-bar {
       display: flex;
       align-items: center;
       gap: 6px;
       overflow-x: auto;
       scrollbar-width: none;
-      padding: 10px 16px 4px;
+      padding: 8px 14px 4px;
     }
-
     .size-filter-bar::-webkit-scrollbar { display: none; }
 
-    .size-label {
+    .size-tag-label {
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
       color: var(--text-muted);
-      margin-right: 4px;
       white-space: nowrap;
     }
 
     .size-chip {
       background: #ffffff;
-      border: 1px solid #d1d5db;
+      border: 1px solid #cbd5e1;
       color: var(--text);
-      padding: 4px 10px;
-      border-radius: var(--radius-sm);
-      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11.5px;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.15s ease;
     }
 
     .size-chip.active {
@@ -215,58 +176,48 @@
       font-weight: 800;
     }
 
-    /* ── Catalog Stats & Summary ─────────────────────────────────────── */
-    .catalog-summary {
+    /* ── Subtitle / Stock Counter ────────────────────────────────── */
+    .catalog-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 16px 6px;
-      font-size: 12px;
+      padding: 6px 14px;
+      font-size: 11.5px;
       color: var(--text-muted);
     }
+    .catalog-bar b { color: var(--text); }
 
-    .catalog-summary b {
-      color: var(--text);
-    }
-
-    /* ── Product Grid ────────────────────────────────────────────────── */
+    /* ── Optimized Grid ─────────────────────────────────────────── */
     .product-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      padding: 6px 14px 20px;
+      gap: 10px;
+      padding: 4px 12px 14px;
     }
 
-    @media (min-width: 650px) {
-      .product-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
+    @media (min-width: 600px) {
+      .product-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
-    /* ── Product Card (Amazon / ASOS Clean Aesthetic) ─────────────────── */
+    /* ── Fast Card ───────────────────────────────────────────────── */
     .card {
-      background: var(--card-bg);
+      background: #ffffff;
       border: 1px solid var(--card-border);
-      border-radius: var(--radius-md);
+      border-radius: var(--radius);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: var(--shadow-sm);
       cursor: pointer;
-      position: relative;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      contain: content; /* Massive RAM/Rendering optimization for WebKit */
     }
 
-    .card:active {
-      transform: scale(0.98);
-    }
+    .card:active { opacity: 0.92; }
 
     .card-img-wrap {
       width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #f1f5f9;
+      height: 150px;
+      background: #e2e8f0;
       position: relative;
-      overflow: hidden;
     }
 
     .card-img {
@@ -274,284 +225,266 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: opacity 0.3s ease;
     }
 
     .card-badge {
       position: absolute;
-      top: 8px;
-      left: 8px;
-      font-size: 9px;
+      top: 6px;
+      left: 6px;
+      font-size: 8.5px;
       font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 3px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 3px 6px;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
     }
 
-    .badge-primary {
-      background: #0f172a;
-      color: #ffffff;
-    }
+    .badge-primary { background: #0f172a; color: #ffffff; }
+    .badge-rare { background: #dc2626; color: #ffffff; }
+    .badge-amber { background: var(--amber); color: #0f172a; }
 
-    .badge-rare {
-      background: #dc2626;
-      color: #ffffff;
-    }
-
-    .badge-amber {
-      background: var(--amber);
-      color: #0f172a;
-    }
-
-    .size-tag {
+    .size-pill {
       position: absolute;
-      bottom: 8px;
-      right: 8px;
+      bottom: 6px;
+      right: 6px;
       background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(4px);
       border: 1px solid var(--card-border);
-      color: var(--text);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 800;
-      padding: 2px 7px;
+      padding: 1px 6px;
       border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
     .card-body {
-      padding: 10px 10px 12px;
+      padding: 8px 8px 10px;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
       justify-content: space-between;
     }
 
-    .brand-text {
-      font-size: 10.5px;
+    .brand-name {
+      font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
       color: var(--text-muted);
       margin-bottom: 2px;
     }
 
-    .title-text {
-      font-size: 13px;
+    .title-name {
+      font-size: 12px;
       font-weight: 700;
       color: var(--text);
-      line-height: 1.3;
-      margin-bottom: 5px;
+      line-height: 1.25;
+      margin-bottom: 6px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      min-height: 34px;
+      min-height: 30px;
     }
 
-    .rating-row {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: var(--amber-dark);
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .rating-count {
-      color: var(--text-subtle);
-      font-weight: 500;
-    }
-
-    .card-footer {
+    .card-foot {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-top: auto;
-      padding-top: 8px;
+      padding-top: 6px;
       border-top: 1px solid #f1f5f9;
     }
 
-    .price-tag {
-      font-size: 16px;
+    .price-value {
+      font-size: 14.5px;
       font-weight: 900;
       color: var(--text);
     }
 
-    .claim-action-btn {
+    .claim-pill {
       background: var(--amber);
       color: #0f172a;
       border: none;
-      padding: 5px 10px;
-      border-radius: var(--radius-sm);
-      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10.5px;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      box-shadow: 0 1px 2px rgba(245, 158, 11, 0.3);
+      cursor: pointer;
     }
 
-    /* ── Empty State ─────────────────────────────────────────────────── */
-    .empty-state {
-      grid-column: 1 / -1;
+    /* ── Pagination / Load More ──────────────────────────────────── */
+    .load-more-wrap {
       text-align: center;
-      padding: 50px 20px;
-      background: #ffffff;
-      border-radius: var(--radius-md);
-      border: 1px dashed var(--card-border);
+      padding: 10px 14px 20px;
     }
 
-    .empty-icon { font-size: 36px; margin-bottom: 10px; opacity: 0.6; }
-    .empty-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
-    .empty-sub { font-size: 12px; color: var(--text-muted); }
+    .load-more-btn {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+      padding: 10px 24px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
 
-    /* ── Claim Bottom Sheet Modal ────────────────────────────────────── */
+    /* ── Claim Sheet Modal ───────────────────────────────────────── */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.65);
       z-index: 100;
       align-items: flex-end;
       justify-content: center;
     }
-
     .modal-overlay.open { display: flex; }
 
     .modal-sheet {
       background: #ffffff;
-      border-top-left-radius: var(--radius-lg);
-      border-top-right-radius: var(--radius-lg);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
       width: 100%;
-      max-width: 520px;
-      padding: 16px 20px 32px;
-      max-height: 88vh;
+      max-width: 500px;
+      padding: 16px 18px 28px;
+      max-height: 85vh;
       overflow-y: auto;
-      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.15);
-      animation: sheetUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes sheetUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
     }
 
     .sheet-handle {
-      width: 40px;
+      width: 36px;
       height: 4px;
       background: #cbd5e1;
       border-radius: 2px;
-      margin: 0 auto 16px;
+      margin: 0 auto 12px;
     }
 
-    .modal-header-row {
+    .modal-top-row {
       display: flex;
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
-    .modal-thumb {
-      width: 80px;
-      height: 80px;
-      border-radius: var(--radius-sm);
+    .modal-img {
+      width: 72px;
+      height: 72px;
+      border-radius: 6px;
       object-fit: cover;
       background: #f1f5f9;
       border: 1px solid var(--card-border);
       flex-shrink: 0;
     }
 
-    .modal-info { flex: 1; }
-    .modal-brand { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
-    .modal-title { font-size: 15px; font-weight: 800; color: var(--text); margin: 2px 0 6px; }
-    .modal-chips { display: flex; gap: 6px; align-items: center; }
-    .modal-chip { font-size: 11px; font-weight: 800; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--card-border); }
-    .modal-price { font-size: 17px; font-weight: 900; color: var(--text); margin-left: auto; }
+    .modal-details { flex: 1; }
+    .m-brand { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+    .m-title { font-size: 14px; font-weight: 800; color: var(--text); margin: 2px 0 4px; }
+    .m-chips { display: flex; gap: 6px; align-items: center; }
+    .m-chip { font-size: 10.5px; font-weight: 800; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
+    .m-price { font-size: 16px; font-weight: 900; color: var(--text); margin-left: auto; }
 
-    .hold-alert {
-      background: var(--amber-light);
-      border: 1px solid #fde68a;
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      font-size: 12px;
-      color: #92400e;
-      margin-bottom: 16px;
+    .payment-notice {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      border-radius: 6px;
+      padding: 9px 12px;
+      font-size: 11.5px;
+      margin-bottom: 12px;
+      line-height: 1.45;
     }
 
-    .section-label {
+    .pay-methods-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      font-weight: 800;
+    }
+
+    .pay-tag {
+      background: #ffffff;
+      border: 1px solid #10b981;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10.5px;
+    }
+
+    .modal-label {
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
       color: var(--text-muted);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .fulfillment-grid {
+    .ful-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
-    .ful-option {
+    .ful-card {
       border: 1.5px solid var(--card-border);
       background: #ffffff;
-      padding: 12px;
-      border-radius: var(--radius-sm);
+      padding: 10px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.15s ease;
     }
 
-    .ful-option.selected {
+    .ful-card.selected {
       border-color: var(--amber-dark);
       background: #fffbeb;
     }
 
-    .ful-option h4 { font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
-    .ful-option p { font-size: 11px; color: var(--text-muted); }
+    .ful-card h4 { font-size: 12.5px; font-weight: 800; margin-bottom: 2px; }
+    .ful-card p { font-size: 10.5px; color: var(--text-muted); }
 
-    .input-field {
+    .modal-input {
       width: 100%;
       background: #f8f9fa;
       border: 1px solid var(--card-border);
-      border-radius: var(--radius-sm);
-      padding: 11px 14px;
-      font-size: 14px;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 13.5px;
       color: var(--text);
       outline: none;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
-    .input-field:focus {
-      border-color: var(--amber-dark);
-      background: #ffffff;
+    .action-buttons-row {
+      display: flex;
+      gap: 8px;
     }
 
-    .modal-confirm-btn {
-      width: 100%;
+    .call-btn {
+      flex: 1;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: var(--text);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .claim-btn-main {
+      flex: 2;
       background: var(--amber);
       color: #0f172a;
       border: none;
-      padding: 14px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13.5px;
       font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
-      transition: background 0.15s ease;
     }
 
-    .modal-confirm-btn:active {
-      background: var(--amber-dark);
-    }
+    .claim-btn-main:active { background: var(--amber-dark); }
   </style>
 </head>
 <body>
@@ -559,169 +492,277 @@
   <!-- Top Navigation & Brand Header -->
   <header class="top-nav">
     <div class="nav-header">
-      <div class="brand-logo">
-        🛍️ BOUTIQUE ARCHIVE
+      <div class="brand-title">
+        🛍️ <span id="brandLabel">ቦቲካ ሾውሩም</span>
       </div>
-      <div class="live-status">
-        <span class="live-dot"></span>
-        In Stock · 1-of-1
-      </div>
+      <button class="lang-toggle-btn" id="langToggle">
+        <span id="langFlag">🇬🇧</span> <span id="langName">English</span>
+      </button>
     </div>
 
     <!-- Live Search -->
     <div class="search-box">
       <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" class="search-input" placeholder="Search shoes, hoodies, tees, denim, jackets...">
+      <input type="text" id="searchInput" class="search-input" placeholder="ፈልግ (ጫማ፣ ሁዲ፣ ሱሪ፣ ጃኬት)...">
     </div>
 
     <!-- Department Carousel -->
     <div class="dept-scroll" id="deptTabs">
-      <button class="dept-pill active" data-dept="ALL">🔥 All Items</button>
-      <button class="dept-pill" data-dept="shoes">👟 Shoes</button>
-      <button class="dept-pill" data-dept="hoodies">🧥 Hoodies</button>
-      <button class="dept-pill" data-dept="tees">👕 Tees</button>
-      <button class="dept-pill" data-dept="jackets">🥼 Jackets</button>
-      <button class="dept-pill" data-dept="pants">👖 Pants</button>
-      <button class="dept-pill" data-dept="accessories">🧢 Accessories</button>
+      <button class="dept-pill active" data-dept="ALL" id="deptAll">🔥 ሁሉም (All)</button>
+      <button class="dept-pill" data-dept="shoes" id="deptShoes">👟 ጫማዎች</button>
+      <button class="dept-pill" data-dept="hoodies" id="deptHoodies">🧥 ሁዲዎች</button>
+      <button class="dept-pill" data-dept="tees" id="deptTees">👕 ቲሸርቶች</button>
+      <button class="dept-pill" data-dept="jackets" id="deptJackets">🥼 ጃኬቶች</button>
+      <button class="dept-pill" data-dept="pants" id="deptPants">👖 ሱሪዎች</button>
+      <button class="dept-pill" data-dept="accessories" id="deptAcc">🧢 መለዋወጫዎች</button>
     </div>
   </header>
 
-  <!-- Size Quick Filters -->
+  <!-- Secondary Size Filters -->
   <div class="size-filter-bar" id="sizeFilters">
-    <span class="size-label">Size:</span>
-    <button class="size-chip active" data-size="ALL">All Sizes</button>
+    <span class="size-tag-label" id="sizeLabel">መጠን:</span>
+    <button class="size-chip active" data-size="ALL" id="sizeAll">ሁሉም</button>
     <button class="size-chip" data-size="S">S</button>
     <button class="size-chip" data-size="M">M</button>
     <button class="size-chip" data-size="L">L</button>
     <button class="size-chip" data-size="XL">XL</button>
-    <button class="size-chip" data-size="US 9">US 9</button>
-    <button class="size-chip" data-size="US 10">US 10</button>
-    <button class="size-chip" data-size="US 11">US 11</button>
-    <button class="size-chip" data-size="32 / 32">32x32</button>
+    <button class="size-chip" data-size="EU 42 (US 9)">EU 42</button>
+    <button class="size-chip" data-size="EU 43 (US 10)">EU 43</button>
+    <button class="size-chip" data-size="EU 44 (US 11)">EU 44</button>
   </div>
 
   <!-- Catalog Summary -->
-  <div class="catalog-summary">
-    <span id="catalogCount">Showing <b>24</b> available pieces</span>
-    <span>⚡ Instant 30-min hold</span>
+  <div class="catalog-bar">
+    <span id="catalogCount">ያሉ ዕቃዎች: <b>24</b></span>
+    <span id="stockHoldNotice">⚡ የ 30 ደቂቃ ያዝ (Hold)</span>
   </div>
 
   <!-- Product Grid -->
   <main class="product-grid" id="productGrid"></main>
+
+  <!-- Load More Button -->
+  <div class="load-more-wrap" id="loadMoreWrap">
+    <button class="load-more-btn" id="loadMoreBtn">ተጨማሪ አሳይ / Show More</button>
+  </div>
 
   <!-- Claim Sheet Modal -->
   <div class="modal-overlay" id="claimModal">
     <div class="modal-sheet">
       <div class="sheet-handle"></div>
 
-      <div class="modal-header-row">
-        <img id="modalImg" class="modal-thumb" src="" alt="Item">
-        <div class="modal-info">
-          <div id="modalBrand" class="modal-brand">BRAND</div>
-          <div id="modalTitle" class="modal-title">Item Title</div>
-          <div class="modal-chips">
-            <span id="modalSize" class="modal-chip">SIZE</span>
-            <span id="modalBadge" class="modal-chip">1-OF-1</span>
-            <span id="modalPrice" class="modal-price">$0</span>
+      <div class="modal-top-row">
+        <img id="modalImg" class="modal-img" src="" alt="Item">
+        <div class="modal-details">
+          <div id="modalBrand" class="m-brand">BRAND</div>
+          <div id="modalTitle" class="m-title">Title</div>
+          <div class="m-chips">
+            <span id="modalSize" class="m-chip">SIZE</span>
+            <span id="modalBadge" class="m-chip">1-OF-1</span>
+            <span id="modalPrice" class="m-price">0 ብር</span>
           </div>
         </div>
       </div>
 
-      <div class="hold-alert">
-        <span>⏱️</span>
-        <span><b>30-Minute Instant Lock:</b> Claiming reserves this exact piece so nobody else can take it while you finalize payment in Telegram.</span>
-      </div>
-
-      <div class="section-label">Choose Fulfillment</div>
-      <div class="fulfillment-grid">
-        <div class="ful-option selected" id="optPickup" data-val="pickup">
-          <h4>🏬 Store Pickup</h4>
-          <p>Collect at boutique (Free hold)</p>
-        </div>
-        <div class="ful-option" id="optDelivery" data-val="delivery">
-          <h4>🚚 Courier Delivery</h4>
-          <p>Local express to your door</p>
+      <div class="payment-notice">
+        <div>⏱️ <b id="holdNotice">የ 30 ደቂቃ መያዣ:</b> <span id="holdSub">እቃውን ያዙ! በ 30 ደቂቃ ውስጥ በቴሌብር ወይም በንግድ ባንክ (CBE) ከፍለው ያረጋግጣሉ።</span></div>
+        <div class="pay-methods-row">
+          <span class="pay-tag">📱 Telebirr</span>
+          <span class="pay-tag">🏦 CBE Birr</span>
+          <span class="pay-tag">💵 በአካል / Cash</span>
         </div>
       </div>
 
-      <div class="section-label">Contact / Delivery Address (Optional)</div>
-      <input type="text" id="contactInput" class="input-field" placeholder="@username, phone or delivery street address">
+      <div class="modal-label" id="fulLabel">የመቀበያ መንገድ</div>
+      <div class="ful-grid">
+        <div class="ful-card selected" id="optPickup" data-val="pickup">
+          <h4 id="fulPickTitle">🏬 ከሱቅ መውሰጃ</h4>
+          <p id="fulPickSub">በነፃ ይያዛል</p>
+        </div>
+        <div class="ful-card" id="optDelivery" data-val="delivery">
+          <h4 id="fulDelTitle">🚚 በሞተር ማድረሻ</h4>
+          <p id="fulDelSub">አዲስ አበባ ውስጥ</p>
+        </div>
+      </div>
 
-      <button class="modal-confirm-btn" id="btnConfirmClaim">Lock Piece for 30 Min</button>
+      <div class="modal-label" id="contactLabel">የስልክ ቁጥር ወይም አድራሻ (አማራጭ)</div>
+      <input type="text" id="contactInput" class="modal-input" placeholder="09... ወይም @ቴሌግራም">
+
+      <div class="action-buttons-row">
+        <a href="tel:+251911000000" class="call-btn" id="callShopBtn">
+          📞 <span id="callLabel">ደውል</span>
+        </a>
+        <button class="claim-btn-main" id="btnConfirmClaim">እቃውን ያዙ (Lock 30 Min)</button>
+      </div>
     </div>
   </div>
 
   <script>
-    // Initialize Telegram WebApp
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
     }
 
-    // Comprehensive 24-piece inventory across all departments
+    // Localization Strings
+    const I18N = {
+      am: {
+        brand: "ቦቲካ ሾውሩም",
+        langToggle: "English",
+        langFlag: "🇬🇧",
+        searchPlaceholder: "ፈልግ (ጫማ፣ ሁዲ፣ ሱሪ፣ ጃኬት)...",
+        deptAll: "🔥 ሁሉም",
+        deptShoes: "👟 ጫማዎች",
+        deptHoodies: "🧥 ሁዲዎች",
+        deptTees: "👕 ቲሸርቶች",
+        deptJackets: "🥼 ጃኬቶች",
+        deptPants: "👖 ሱሪዎች",
+        deptAcc: "🧢 መለዋወጫዎች",
+        sizeLabel: "መጠን:",
+        sizeAll: "ሁሉም",
+        showing: "ያሉ ዕቃዎች: ",
+        instantHold: "⚡ የ 30 ደቂቃ ያዝ",
+        claimBtn: "ያዙ",
+        loadMore: "ተጨማሪ አሳይ",
+        holdTitle: "የ 30 ደቂቃ መያዣ:",
+        holdSub: "እቃውን ያዙ! በ 30 ደቂቃ ውስጥ በቴሌብር ወይም በንግድ ባንክ ከፍለው ያረጋግጣሉ።",
+        fulLabel: "የመቀበያ መንገድ",
+        pickupTitle: "🏬 ከሱቅ መውሰጃ",
+        pickupSub: "በነፃ ይያዛል",
+        delTitle: "🚚 በሞተር ማድረሻ",
+        delSub: "አዲስ አበባ ውስጥ",
+        contactPlaceholder: "09... ወይም @ቴሌግራም",
+        callText: "ደውል",
+        confirmBtn: "እቃውን ያዙ (Lock 30 Min)",
+        empty: "የተፈለገው እቃ አልተገኘም"
+      },
+      en: {
+        brand: "BOUTIQUE ARCHIVE",
+        langToggle: "አማርኛ",
+        langFlag: "🇪🇹",
+        searchPlaceholder: "Search shoes, hoodies, tees, jackets...",
+        deptAll: "🔥 All Items",
+        deptShoes: "👟 Shoes",
+        deptHoodies: "🧥 Hoodies",
+        deptTees: "👕 Tees",
+        deptJackets: "🥼 Jackets",
+        deptPants: "👖 Pants",
+        deptAcc: "🧢 Accessories",
+        sizeLabel: "Size:",
+        sizeAll: "All Sizes",
+        showing: "Available pieces: ",
+        instantHold: "⚡ 30-min hold",
+        claimBtn: "Claim",
+        loadMore: "Show More",
+        holdTitle: "30-Minute Hold:",
+        holdSub: "Piece locked! Confirm payment via Telebirr or CBE within 30 minutes.",
+        fulLabel: "Fulfillment Method",
+        pickupTitle: "🏬 Store Pickup",
+        pickupSub: "Free reservation",
+        delTitle: "🚚 Courier Delivery",
+        delSub: "Addis Ababa delivery",
+        contactPlaceholder: "09... or @username",
+        callText: "Call Shop",
+        confirmBtn: "Lock Piece (30 Min)",
+        empty: "No matching pieces found"
+      }
+    };
+
+    let currentLang = "am";
+
+    // 24 Optimized lightweight catalog items
     const CATALOG = [
-      // Footwear
-      { id:"botz-shoe-01", category:"shoes", brand:"Nike", title:"Dunk Low Retro 'Panda' Black/White", size:"US 10", price:"$115", badge:"DEADSTOCK", badgeClass:"badge-primary", rating:"4.9", reviews:"142", image:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=85" },
-      { id:"botz-shoe-02", category:"shoes", brand:"Air Jordan", title:"Air Jordan 4 Retro 'Military Black'", size:"US 11", price:"$295", badge:"VERIFIED GRAIL", badgeClass:"badge-rare", rating:"5.0", reviews:"89", image:"https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&q=85" },
-      { id:"botz-shoe-03", category:"shoes", brand:"New Balance", title:"990v3 MiUSA Grey Classic Heritage", size:"US 9", price:"$145", badge:"CLEAN 9.5/10", badgeClass:"badge-primary", rating:"4.8", reviews:"64", image:"https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=85" },
-      { id:"botz-shoe-04", category:"shoes", brand:"Salomon", title:"XT-6 Advanced Black / Phantom Edition", size:"US 10.5", price:"$175", badge:"HOT DROP", badgeClass:"badge-amber", rating:"4.9", reviews:"51", image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=85" },
+      // Shoes
+      { id:"botz-shoe-01", category:"shoes", brand:"Nike", title:"Dunk Low Retro 'Panda'", size:"EU 43 (US 10)", price:"5,500 ብር", badge:"አዲስ / DEADSTOCK", badge_en:"DEADSTOCK", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-shoe-02", category:"shoes", brand:"Air Jordan", title:"Air Jordan 4 'Military Black'", size:"EU 44 (US 11)", price:"9,800 ብር", badge:"ኦሪጅናል / 1-OF-1", badge_en:"VERIFIED GRAIL", badgeClass:"badge-rare", image:"https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-shoe-03", category:"shoes", brand:"New Balance", title:"990v3 MiUSA Grey Classic", size:"EU 42 (US 9)", price:"6,200 ብር", badge:"ጥሩ ይዞታ (9.5/10)", badge_en:"CLEAN 9.5/10", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1539185441755-769473a23570?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-shoe-04", category:"shoes", brand:"Salomon", title:"XT-6 Advanced Black Edition", size:"EU 43.5", price:"7,800 ብር", badge:"ትኩስ እቃ / HOT", badge_en:"HOT DROP", badgeClass:"badge-amber", image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=70&auto=format&fit=crop" },
 
-      // Hoodies & Sweats
-      { id:"botz-hood-01", category:"hoodies", brand:"Stüssy", title:"8-Ball Mohair Knit Crewneck Sweater", size:"L", price:"$185", badge:"ARCHIVE", badgeClass:"badge-rare", rating:"4.9", reviews:"78", image:"https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=85" },
-      { id:"botz-hood-02", category:"hoodies", brand:"Supreme", title:"Heavyweight Box Logo Hooded Sweatshirt (FW22)", size:"M", price:"$240", badge:"1-OF-1 PIECE", badgeClass:"badge-rare", rating:"5.0", reviews:"116", image:"https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=85" },
-      { id:"botz-hood-03", category:"hoodies", brand:"Fear of God Essentials", title:"Oversized Fleece Pullover Hoodie Oatmeal", size:"XL", price:"$110", badge:"BESTSELLER", badgeClass:"badge-primary", rating:"4.8", reviews:"93", image:"https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=600&q=85" },
-      { id:"botz-hood-04", category:"hoodies", brand:"Champion Reverse Weave", title:"Vintage 90s Heather Grey College Hoodie", size:"L", price:"$85", badge:"VINTAGE", badgeClass:"badge-amber", rating:"4.7", reviews:"38", image:"https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=600&q=85" },
+      // Hoodies
+      { id:"botz-hood-01", category:"hoodies", brand:"Stüssy", title:"8-Ball Mohair Knit Sweater", size:"L", price:"4,200 ብር", badge:"አንድ ብቻ / 1-OF-1", badge_en:"ARCHIVE", badgeClass:"badge-rare", image:"https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-hood-02", category:"hoodies", brand:"Supreme", title:"Heavyweight Box Logo Hoodie", size:"M", price:"6,500 ብር", badge:"1 ብቻ የቀረ", badge_en:"1-OF-1 PIECE", badgeClass:"badge-rare", image:"https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-hood-03", category:"hoodies", brand:"FOG Essentials", title:"Oversized Fleece Pullover", size:"XL", price:"4,800 ብር", badge:"ተፈላጊ / BESTSELLER", badge_en:"BESTSELLER", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-hood-04", category:"hoodies", brand:"Champion", title:"Vintage 90s Reverse Weave", size:"L", price:"3,400 ብር", badge:"ቪንቴጅ / VINTAGE", badge_en:"VINTAGE", badgeClass:"badge-amber", image:"https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=400&q=70&auto=format&fit=crop" },
 
-      // Tees & Tops
-      { id:"botz-tee-01", category:"tees", brand:"Vintage 1994", title:"Pink Floyd 'Division Bell' World Tour Tee", size:"L", price:"$140", badge:"1-OF-1 VINTAGE", badgeClass:"badge-rare", rating:"5.0", reviews:"42", image:"https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=85" },
-      { id:"botz-tee-02", category:"tees", brand:"Comme des Garçons Play", title:"Double Red Heart Stripe Long-Sleeve Tee", size:"M", price:"$95", badge:"EXCELLENT 9/10", badgeClass:"badge-primary", rating:"4.8", reviews:"67", image:"https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=85" },
-      { id:"botz-tee-03", category:"tees", brand:"Harley-Davidson 3D", title:"1997 Eagle Lightning Faded Washed Tee", size:"XL", price:"$125", badge:"RARE WASH", badgeClass:"badge-amber", rating:"4.9", reviews:"29", image:"https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&q=85" },
-      { id:"botz-tee-04", category:"tees", brand:"Ralph Lauren", title:"Custom Slim-Fit Oxford Piqué Polo Navy", size:"S", price:"$55", badge:"MINT CONDITION", badgeClass:"badge-primary", rating:"4.7", reviews:"84", image:"https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=600&q=85" },
+      // Tees
+      { id:"botz-tee-01", category:"tees", brand:"Vintage 1994", title:"Pink Floyd Tour Washed Tee", size:"L", price:"2,800 ብር", badge:"1-OF-1 VINTAGE", badge_en:"1-OF-1 VINTAGE", badgeClass:"badge-rare", image:"https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-tee-02", category:"tees", brand:"CDG Play", title:"Double Red Heart Long-Sleeve", size:"M", price:"3,200 ብር", badge:"ጥሩ ይዞታ (9/10)", badge_en:"EXCELLENT 9/10", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-tee-03", category:"tees", brand:"Harley-Davidson", title:"1997 Eagle Lightning Washed", size:"XL", price:"3,100 ብር", badge:"ብርቅዬ / RARE", badge_en:"RARE WASH", badgeClass:"badge-amber", image:"https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-tee-04", category:"tees", brand:"Ralph Lauren", title:"Custom Slim-Fit Oxford Polo", size:"S", price:"2,400 ብር", badge:"አዲስ የመሰለ", badge_en:"MINT CONDITION", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&q=70&auto=format&fit=crop" },
 
-      // Jackets & Outerwear
-      { id:"botz-jack-01", category:"jackets", brand:"Arc'teryx", title:"Beta LT Gore-Tex Shell Mountain Jacket", size:"M", price:"$320", badge:"GRAIL SHELL", badgeClass:"badge-rare", rating:"5.0", reviews:"98", image:"https://images.unsplash.com/photo-1548883354-7622d03aca27?w=600&q=85" },
-      { id:"botz-jack-02", category:"jackets", brand:"Carhartt WIP", title:"Detroit Duck Canvas Blanket-Lined Jacket", size:"XL", price:"$165", badge:"WORKWEAR ICON", badgeClass:"badge-primary", rating:"4.9", reviews:"153", image:"https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=85" },
-      { id:"botz-jack-03", category:"jackets", brand:"The North Face", title:"1996 Retro Nuptse 700-Fill Down Puffer", size:"L", price:"$210", badge:"PRIME WARMTH", badgeClass:"badge-primary", rating:"4.9", reviews:"210", image:"https://images.unsplash.com/photo-1544441893-675973e31985?w=600&q=85" },
-      { id:"botz-jack-04", category:"jackets", brand:"Schott NYC", title:"Classic Steerhide Leather Biker Jacket", size:"L", price:"$420", badge:"LIFETIME GRAIL", badgeClass:"badge-rare", rating:"5.0", reviews:"47", image:"https://images.unsplash.com/photo-1520975916090-3105956dac38?w=600&q=85" },
+      // Jackets
+      { id:"botz-jack-01", category:"jackets", brand:"Arc'teryx", title:"Beta LT Gore-Tex Shell Jacket", size:"M", price:"11,500 ብር", badge:"ኦሪጅናል ሼል", badge_en:"GRAIL SHELL", badgeClass:"badge-rare", image:"https://images.unsplash.com/photo-1548883354-7622d03aca27?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-jack-02", category:"jackets", brand:"Carhartt WIP", title:"Detroit Canvas Blanket Jacket", size:"XL", price:"5,800 ብር", badge:"የስራ ልብስ / ICON", badge_en:"WORKWEAR ICON", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-jack-03", category:"jackets", brand:"The North Face", title:"1996 Retro Nuptse 700 Puffer", size:"L", price:"7,500 ብር", badge:"ሞቅ ያለ ፑፈር", badge_en:"PRIME WARMTH", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1544441893-675973e31985?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-jack-04", category:"jackets", brand:"Schott NYC", title:"Steerhide Heavy Leather Biker", size:"L", price:"14,000 ብር", badge:"እውነተኛ ሌዘር", badge_en:"LIFETIME GRAIL", badgeClass:"badge-rare", image:"https://images.unsplash.com/photo-1520975916090-3105956dac38?w=400&q=70&auto=format&fit=crop" },
 
-      // Pants & Denim
-      { id:"botz-pant-01", category:"pants", brand:"Carhartt WIP", title:"Double Knee Canvas Work Pant Hamilton Brown", size:"32 / 32", price:"$125", badge:"DOUBLE KNEE", badgeClass:"badge-primary", rating:"4.9", reviews:"76", image:"https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=85" },
-      { id:"botz-pant-02", category:"pants", brand:"Levi's Vintage", title:"1954 501Z Selvedge Raw Rigid Denim", size:"34 / 32", price:"$175", badge:"SELVEDGE", badgeClass:"badge-rare", rating:"4.9", reviews:"61", image:"https://images.unsplash.com/photo-1542272604-780c96856592?w=600&q=85" },
-      { id:"botz-pant-03", category:"pants", brand:"Dickies 874", title:"Original Fit Work Trousers Lincoln Green", size:"30 / 30", price:"$50", badge:"DEADSTOCK", badgeClass:"badge-primary", rating:"4.7", reviews:"119", image:"https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=600&q=85" },
-      { id:"botz-pant-04", category:"pants", brand:"Needles", title:"Poly Smooth Butterfly Track Pants Eggplant", size:"M", price:"$195", badge:"JAPAN ARCHIVE", badgeClass:"badge-amber", rating:"4.8", reviews:"34", image:"https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=600&q=85" },
+      // Pants
+      { id:"botz-pant-01", category:"pants", brand:"Carhartt WIP", title:"Double Knee Canvas Work Pant", size:"32 / 32", price:"3,600 ብር", badge:"ዳብል ኒ / DOUBLE KNEE", badge_en:"DOUBLE KNEE", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-pant-02", category:"pants", brand:"Levi's", title:"1954 501Z Selvedge Rigid Denim", size:"34 / 32", price:"4,400 ብር", badge:"ሴልቬጅ ጂንስ", badge_en:"SELVEDGE", badgeClass:"badge-rare", image:"https://images.unsplash.com/photo-1542272604-780c96856592?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-pant-03", category:"pants", brand:"Dickies 874", title:"Original Fit Work Trousers", size:"30 / 30", price:"2,200 ብር", badge:"አዲስ / DEADSTOCK", badge_en:"DEADSTOCK", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-pant-04", category:"pants", brand:"Needles", title:"Poly Smooth Butterfly Track Pants", size:"M", price:"5,100 ብር", badge:"አንድ ብቻ / ARCHIVE", badge_en:"JAPAN ARCHIVE", badgeClass:"badge-amber", image:"https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=70&auto=format&fit=crop" },
 
       // Accessories
-      { id:"botz-acc-01", category:"accessories", brand:"Prada", title:"Re-Nylon Triangle Logo Crossbody Messenger", size:"One Size", price:"$380", badge:"AUTHENTIC LUXURY", badgeClass:"badge-rare", rating:"5.0", reviews:"52", image:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=85" },
-      { id:"botz-acc-02", category:"accessories", brand:"New Era x MoMA", title:"NY Yankees 59FIFTY Fitted Cap Black/White", size:"7 3/8", price:"$65", badge:"LIMITED EDITION", badgeClass:"badge-primary", rating:"4.9", reviews:"88", image:"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&q=85" },
-      { id:"botz-acc-03", category:"accessories", brand:"Ray-Ban", title:"Wayfarer Classic Polarized Black Acetate", size:"Standard", price:"$110", badge:"POLARIZED", badgeClass:"badge-primary", rating:"4.8", reviews:"140", image:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=85" },
-      { id:"botz-acc-04", category:"accessories", brand:"Porter Yoshida & Co.", title:"Tanker 2-Way Helmet Travel Tote Sage Green", size:"One Size", price:"$220", badge:"MADE IN JAPAN", badgeClass:"badge-amber", rating:"4.9", reviews:"31", image:"https://images.unsplash.com/photo-1547949003-9792a18a2601?w=600&q=85" }
+      { id:"botz-acc-01", category:"accessories", brand:"Prada", title:"Re-Nylon Crossbody Messenger Bag", size:"One Size", price:"8,500 ብር", badge:"ኦሪጅናል ቦርሳ", badge_en:"AUTHENTIC LUXURY", badgeClass:"badge-rare", image:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-acc-02", category:"accessories", brand:"New Era", title:"NY Yankees 59FIFTY Fitted Cap", size:"7 3/8", price:"1,900 ብር", badge:"ኦሪጅናል ቆብ", badge_en:"LIMITED EDITION", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-acc-03", category:"accessories", brand:"Ray-Ban", title:"Wayfarer Classic Polarized Black", size:"Standard", price:"3,400 ብር", badge:"ፖላራይዝድ መነፅር", badge_en:"POLARIZED", badgeClass:"badge-primary", image:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=70&auto=format&fit=crop" },
+      { id:"botz-acc-04", category:"accessories", brand:"Porter Yoshida", title:"Tanker 2-Way Travel Tote Bag", size:"One Size", price:"4,900 ብር", badge:"ጃፓን የተሰራ", badge_en:"MADE IN JAPAN", badgeClass:"badge-amber", image:"https://images.unsplash.com/photo-1547949003-9792a18a2601?w=400&q=70&auto=format&fit=crop" }
     ];
 
     let currentDept = "ALL";
     let currentSize = "ALL";
     let searchQuery = "";
+    let visibleCount = 8; // Virtual pagination: loads 8 items initially for max performance
     let selectedItem = null;
     let selectedFulfillment = "pickup";
 
     const productGrid = document.getElementById("productGrid");
     const catalogCount = document.getElementById("catalogCount");
     const searchInput = document.getElementById("searchInput");
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    const loadMoreWrap = document.getElementById("loadMoreWrap");
     const claimModal = document.getElementById("claimModal");
     const optPickup = document.getElementById("optPickup");
     const optDelivery = document.getElementById("optDelivery");
     const btnConfirmClaim = document.getElementById("btnConfirmClaim");
+    const langToggle = document.getElementById("langToggle");
+
+    function applyLanguage() {
+      const t = I18N[currentLang];
+      document.getElementById("brandLabel").innerText = t.brand;
+      document.getElementById("langName").innerText = t.langToggle;
+      document.getElementById("langFlag").innerText = t.langFlag;
+      searchInput.placeholder = t.searchPlaceholder;
+      document.getElementById("deptAll").innerText = t.deptAll;
+      document.getElementById("deptShoes").innerText = t.deptShoes;
+      document.getElementById("deptHoodies").innerText = t.deptHoodies;
+      document.getElementById("deptTees").innerText = t.deptTees;
+      document.getElementById("deptJackets").innerText = t.deptJackets;
+      document.getElementById("deptPants").innerText = t.deptPants;
+      document.getElementById("deptAcc").innerText = t.deptAcc;
+      document.getElementById("sizeLabel").innerText = t.sizeLabel;
+      document.getElementById("sizeAll").innerText = t.sizeAll;
+      document.getElementById("stockHoldNotice").innerText = t.instantHold;
+      loadMoreBtn.innerText = t.loadMore;
+      document.getElementById("holdNotice").innerText = t.holdTitle;
+      document.getElementById("holdSub").innerText = t.holdSub;
+      document.getElementById("fulLabel").innerText = t.fulLabel;
+      document.getElementById("fulPickTitle").innerText = t.pickupTitle;
+      document.getElementById("fulPickSub").innerText = t.pickupSub;
+      document.getElementById("fulDelTitle").innerText = t.delTitle;
+      document.getElementById("fulDelSub").innerText = t.delSub;
+      document.getElementById("contactInput").placeholder = t.contactPlaceholder;
+      document.getElementById("callLabel").innerText = t.callText;
+      btnConfirmClaim.innerText = t.confirmBtn;
+    }
 
     function renderProducts() {
       productGrid.innerHTML = "";
       const q = searchQuery.toLowerCase().trim();
+      const t = I18N[currentLang];
 
       const filtered = CATALOG.filter(item => {
-        // Department filter
         if (currentDept !== "ALL" && item.category !== currentDept) return false;
-        // Size filter
         if (currentSize !== "ALL" && item.size !== currentSize) return false;
-        // Search filter
         if (q) {
           const match = item.brand.toLowerCase().includes(q) ||
                         item.title.toLowerCase().includes(q) ||
@@ -732,40 +773,39 @@
         return true;
       });
 
-      catalogCount.innerHTML = `Showing <b>${filtered.length}</b> available piece${filtered.length !== 1 ? 's' : ''}`;
+      catalogCount.innerHTML = `${t.showing}<b>${filtered.length}</b>`;
 
       if (filtered.length === 0) {
         productGrid.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">🔎</div>
-            <div class="empty-title">No matching pieces found</div>
-            <div class="empty-sub">Try adjusting your search terms or clearing the size filter.</div>
+          <div style="grid-column: 1/-1; text-align: center; padding: 40px 10px; color: #64748b;">
+            <div style="font-size: 32px; margin-bottom: 6px;">🔎</div>
+            <b>${t.empty}</b>
           </div>
         `;
+        loadMoreWrap.style.display = "none";
         return;
       }
 
-      filtered.forEach(item => {
+      // Render up to visibleCount to keep RAM usage feather-light
+      const pageItems = filtered.slice(0, visibleCount);
+      pageItems.forEach(item => {
+        const badgeLabel = currentLang === "en" ? (item.badge_en || item.badge) : item.badge;
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <div class="card-img-wrap">
             <img class="card-img" src="${item.image}" alt="${item.title}" loading="lazy">
-            <span class="card-badge ${item.badgeClass}">${item.badge}</span>
-            <span class="size-tag">${item.size}</span>
+            <span class="card-badge ${item.badgeClass}">${badgeLabel}</span>
+            <span class="size-pill">${item.size}</span>
           </div>
           <div class="card-body">
             <div>
-              <div class="brand-text">${item.brand}</div>
-              <div class="title-text">${item.title}</div>
-              <div class="rating-row">
-                <span>★</span><span>${item.rating}</span>
-                <span class="rating-count">(${item.reviews})</span>
-              </div>
+              <div class="brand-name">${item.brand}</div>
+              <div class="title-name">${item.title}</div>
             </div>
-            <div class="card-footer">
-              <span class="price-tag">${item.price}</span>
-              <button class="claim-action-btn">Claim</button>
+            <div class="card-foot">
+              <span class="price-value">${item.price}</span>
+              <button class="claim-pill">${t.claimBtn}</button>
             </div>
           </div>
         `;
@@ -773,42 +813,60 @@
         card.addEventListener("click", () => openModal(item));
         productGrid.appendChild(card);
       });
+
+      loadMoreWrap.style.display = filtered.length > visibleCount ? "block" : "none";
     }
 
-    // Search input handler
-    searchInput.addEventListener("input", (e) => {
-      searchQuery = e.target.value;
+    // Language Toggle Button
+    langToggle.addEventListener("click", () => {
+      currentLang = currentLang === "am" ? "en" : "am";
+      applyLanguage();
       renderProducts();
     });
 
-    // Department tabs handler
+    // Load More Pagination
+    loadMoreBtn.addEventListener("click", () => {
+      visibleCount += 8;
+      renderProducts();
+    });
+
+    // Search input
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      visibleCount = 8;
+      renderProducts();
+    });
+
+    // Department tabs
     document.getElementById("deptTabs").addEventListener("click", (e) => {
       const pill = e.target.closest(".dept-pill");
       if (!pill) return;
       document.querySelectorAll(".dept-pill").forEach(p => p.classList.remove("active"));
       pill.classList.add("active");
       currentDept = pill.dataset.dept;
+      visibleCount = 8;
       renderProducts();
     });
 
-    // Size filter handler
+    // Size filters
     document.getElementById("sizeFilters").addEventListener("click", (e) => {
       const chip = e.target.closest(".size-chip");
       if (!chip) return;
       document.querySelectorAll(".size-chip").forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
       currentSize = chip.dataset.size;
+      visibleCount = 8;
       renderProducts();
     });
 
-    // Modal Sheet Handlers
+    // Modal controls
     function openModal(item) {
       selectedItem = item;
       document.getElementById("modalImg").src = item.image;
       document.getElementById("modalBrand").innerText = item.brand;
       document.getElementById("modalTitle").innerText = item.title;
-      document.getElementById("modalSize").innerText = `SIZE: ${item.size}`;
-      document.getElementById("modalBadge").innerText = item.badge;
+      document.getElementById("modalSize").innerText = item.size;
+      document.getElementById("modalBadge").innerText = currentLang === "en" ? (item.badge_en || item.badge) : item.badge;
       document.getElementById("modalPrice").innerText = item.price;
       document.getElementById("contactInput").value = "";
       claimModal.classList.add("open");
@@ -856,12 +914,16 @@
         tg.sendData(JSON.stringify(payload));
         tg.close();
       } else {
-        alert(`[Demo Mode] Reserved!\n\n${selectedItem.brand} — ${selectedItem.title}\nSize: ${selectedItem.size}  |  ${selectedItem.price}\nFulfillment: ${selectedFulfillment.toUpperCase()}\n\n30-minute hold initiated.`);
+        const msg = currentLang === "am"
+          ? `✅ እቃው ተይዟል!\n\n${selectedItem.brand} — ${selectedItem.title}\nዋጋ: ${selectedItem.price}\nየ 30 ደቂቃ መያዣ ተጀምሯል።`
+          : `✅ Item Claimed!\n\n${selectedItem.brand} — ${selectedItem.title}\nPrice: ${selectedItem.price}\n30-minute hold initiated.`;
+        alert(msg);
         closeModal();
       }
     });
 
-    // Initial render
+    // Init
+    applyLanguage();
     renderProducts();
   </script>
 </body>
