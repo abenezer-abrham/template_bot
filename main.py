@@ -35,6 +35,20 @@ async def main():
 
     await bot.delete_webhook(drop_pending_updates=True)
 
+    # Set persistent chat menu button to launch the Mini App
+    try:
+        from aiogram.types import MenuButtonWebApp, WebAppInfo
+        from config import WEBAPP_URL
+        await bot.set_chat_menu_button(
+            menu_button=MenuButtonWebApp(
+                text="🔥 Showroom",
+                web_app=WebAppInfo(url=WEBAPP_URL)
+            )
+        )
+    except Exception as e:
+        logging.warning("Could not set chat menu button: %s", e)
+
+
     # FastAPI runs alongside bot in the same event loop
     api_config = uvicorn.Config(
         fastapi_app,

@@ -1,23 +1,42 @@
 """
-Database layer — asyncpg (Supabase / PostgreSQL).
+Database layer — asyncpg (Supabase / PostgreSQL) with in-memory fallback.
 One connection pool, shared across the bot and API server.
 """
+import logging
 import asyncpg
 from config import DATABASE_URL
+from db.seed_data import INVENTORY
+
+log = logging.getLogger(__name__)
 
 _pool: asyncpg.Pool | None = None
+_in_memory_items: list[dict] = []
+_in_memory_claims: dict[int, dict] = {}
+_claim_counter = 1
 
 
-async def get_pool() -> asyncpg.Pool:
+async def get_pool() -> asyncpg.Pool | None:
     global _pool
+    if not DATABASE_URL:
+        return None
     if _pool is None:
-        _pool = await asyncpg.create_pool(DATABASE_URL, min_size=2, max_size=10)
+        try:
+            _pool = await asyncpg.create_pool(DATABASE_URL, min_size=2, max_size=10)
+        except Exception as e:
+            log.warning("Could not connect to PostgreSQL (%s). Running with in-memory data.", e)
+            return None
     return _pool
 
 
 async def init_db() -> None:
     """Create tables if they don't exist."""
     pool = await get_pool()
+    if not pool:
+        log.info("DATABASE_URL not set or unreachable. Initialized in-memory inventory (%d items).", len(INVENTORY))
+        global _in_memory_items
+        _in_memory_items = [dict(i, available=True) for i in INVENTORY]
+        return
+
     async with pool.acquire() as conn:
         await conn.execute("""
             CREATE TABLE IF NOT EXISTS items (
@@ -55,10 +74,17 @@ async def init_db() -> None:
         )
 
 
+
 # ── Items ────────────────────────────────────────────────────────────────────
 
 async def seed_items(items: list[dict]) -> None:
     pool = await get_pool()
+    if not pool:
+        global _in_memory_items
+        if not _in_memory_items:
+            _in_memory_items = [dict(i, available=True) for i in items]
+        return
+
     async with pool.acquire() as conn:
         await conn.executemany(
             """
@@ -78,6 +104,12 @@ async def seed_items(items: list[dict]) -> None:
 
 async def get_available_items(size: str | None = None) -> list[dict]:
     pool = await get_pool()
+    if not pool:
+        res = [i for i in _in_memory_items if i.get("available", True)]
+        if size and size != "ALL":
+            res = [i for i in res if i.get("size") == size]
+        return res
+
     sql = """
         SELECT i.*
         FROM items i
@@ -102,6 +134,12 @@ async def get_available_items(size: str | None = None) -> list[dict]:
 
 async def get_item(item_id: str) -> dict | None:
     pool = await get_pool()
+    if not pool:
+        for i in _in_memory_items:
+            if i["id"] == item_id:
+                return i
+        return None
+
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "SELECT * FROM items WHERE id = $1", item_id
@@ -112,6 +150,19 @@ async def get_item(item_id: str) -> dict | None:
 async def get_all_items_stock() -> list[dict]:
     """Return all items with live status for admin /stock view."""
     pool = await get_pool()
+    if not pool:
+        return [
+            dict(
+                i,
+                claim_id=None,
+                tg_username=None,
+                fulfillment=None,
+                claim_status=None,
+                expires_at=None,
+            )
+            for i in _in_memory_items
+        ]
+
     async with pool.acquire() as conn:
         rows = await conn.fetch("""
             SELECT
@@ -137,6 +188,10 @@ async def get_all_items_stock() -> list[dict]:
 async def add_item(item: dict) -> None:
     """Insert a new item (admin /add_item)."""
     pool = await get_pool()
+    if not pool:
+        _in_memory_items.insert(0, dict(item, available=True))
+        return
+
     async with pool.acquire() as conn:
         await conn.execute(
             """
@@ -160,6 +215,21 @@ async def create_claim(
     contact: str | None,
 ) -> int | None:
     pool = await get_pool()
+    if not pool:
+        global _claim_counter
+        cid = _claim_counter
+        _claim_counter += 1
+        _in_memory_claims[cid] = {
+            "id": cid,
+            "item_id": item_id,
+            "tg_user_id": tg_user_id,
+            "tg_username": tg_username,
+            "fulfillment": fulfillment,
+            "contact": contact,
+            "status": "pending",
+        }
+        return cid
+
     async with pool.acquire() as conn:
         async with conn.transaction():
             available = await conn.fetchval(
@@ -193,6 +263,9 @@ async def create_claim(
 
 async def get_claim(claim_id: int) -> dict | None:
     pool = await get_pool()
+    if not pool:
+        return _in_memory_claims.get(claim_id)
+
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "SELECT * FROM claims WHERE id = $1", claim_id
@@ -202,6 +275,16 @@ async def get_claim(claim_id: int) -> dict | None:
 
 async def mark_claim_paid(claim_id: int) -> bool:
     pool = await get_pool()
+    if not pool:
+        c = _in_memory_claims.get(claim_id)
+        if c and c["status"] == "pending":
+            c["status"] = "paid"
+            for i in _in_memory_items:
+                if i["id"] == c["item_id"]:
+                    i["available"] = False
+            return True
+        return False
+
     async with pool.acquire() as conn:
         async with conn.transaction():
             item_id = await conn.fetchval(
@@ -222,6 +305,9 @@ async def mark_claim_paid(claim_id: int) -> bool:
 
 async def expire_stale_claims() -> int:
     pool = await get_pool()
+    if not pool:
+        return 0
+
     async with pool.acquire() as conn:
         result = await conn.execute(
             """
@@ -231,3 +317,4 @@ async def expire_stale_claims() -> int:
             """
         )
         return int(result.split()[-1])
+
