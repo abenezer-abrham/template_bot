@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>BOTZ Archive</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    /* ── Design tokens ───────────────────────────────────── */
+    :root {
+      --ink:    #111010;
+      --faint:  #1a1815;
+      --card:   #201e1b;
+      --border: #2e2b27;
+      --smoke:  #3d3a36;
+      --warm:   #f4f0ea;
+      --muted:  #8a8480;
+      --gold:   #c9a96e;
+      --gold-d: #b8955a;
+      --red:    #c0624a;
+      --purple: #8e7ab5;
+    }
+
+    /* ── Reset ───────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html { height: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Helvetica Neue", Arial, sans-serif;
+      background: var(--ink);
+      color: var(--warm);
+      min-height: 100%;
+      line-height: 1.4;
+      overscroll-behavior: none;
+    }
+
+    /* ── Header ──────────────────────────────────────────── */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--ink);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px 0;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-name {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--warm);
+    }
+
+    .live-pip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: breathe 2.4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    .drop-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(201, 169, 110, 0.35);
+      padding: 3px 8px;
+      border-radius: 3px;
+    }
+
+    /* ── Size Filter ─────────────────────────────────────── */
+    .filter-wrap {
+      position: relative;
+      padding-bottom: 1px;
+    }
+
+    .filter-scroll {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .filter-scroll::-webkit-scrollbar { display: none; }
+
+    .fchip {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 14px;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .fchip::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--gold);
+      transform: translateX(-50%);
+      transition: width 0.2s ease;
+    }
+
+    .fchip.active {
+      color: var(--warm);
+    }
+
+    .fchip.active::after {
+      width: calc(100% - 20px);
+    }
+
+    /* ── Main content ────────────────────────────────────── */
+    .content {
+      padding: 16px 12px 100px;
+    }
+
+    /* ── Stock counter ───────────────────────────────────── */
+    .stock-line {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .stock-line span {
+      color: var(--gold);
+    }
+
+    /* ── Product grid ────────────────────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* ── Product card ────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.14s ease, border-color 0.14s ease;
+      will-change: transform;
+    }
+
+    .card:active { transform: scale(0.97); }
+
+    .card-img-wrap {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      background: var(--faint);
+      overflow: hidden;
+    }
+
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card-img.loaded { opacity: 1; }
+
+    /* Gradient at bottom of image so text is readable */
+    .card-img-wrap::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 55%;
+      background: linear-gradient(
+        to top,
+        rgba(17, 16, 16, 0.92) 0%,
+        rgba(17, 16, 16, 0.5)  40%,
+        transparent             100%
+      );
+      pointer-events: none;
+    }
+
+    .badge {
+      position: absolute;
+      top: 9px;
+      left: 9px;
+      z-index: 2;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 3px 6px;
+      border-radius: 3px;
+      border: 1px solid;
+    }
+
+    .badge.one-of-one { color: #c0624a; border-color: rgba(192, 98, 74, 0.4); background: rgba(192, 98, 74, 0.12); }
+    .badge.archive    { color: #c9a96e; border-color: rgba(201, 169, 110, 0.4); background: rgba(201, 169, 110, 0.12); }
+    .badge.grail      { color: #8e7ab5; border-color: rgba(142, 122, 181, 0.4); background: rgba(142, 122, 181, 0.12); }
+
+    .img-size {
+      position: absolute;
+      bottom: 50px;
+      left: 9px;
+      z-index: 2;
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(244, 240, 234, 0.75);
+      letter-spacing: 0.04em;
+    }
+
+    .img-price {
+      position: absolute;
+      bottom: 32px;
+      left: 9px;
+      right: 9px;
+      z-index: 2;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--warm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .claim-btn {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--ink);
+      border-radius: 3px;
+      padding: 4px 7px;
+    }
+
+    .card-info {
+      padding: 10px 10px 11px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-brand {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .card-title {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--warm);
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── Skeleton loading ────────────────────────────────── */
+    .skeleton-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .skeleton-img {
+      aspect-ratio: 3 / 4;
+      background: linear-gradient(90deg, var(--faint) 25%, var(--border) 50%, var(--faint) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+
+    .skeleton-text {
+      padding: 10px;
+    }
+
+    .skeleton-line {
+      height: 10px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--faint) 25%, var(--border) 50%, var(--faint) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      margin-bottom: 7px;
+    }
+
+    .skeleton-line.short { width: 60%; }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── Empty state ─────────────────────────────────────── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 52px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--warm);
+      margin-bottom: 6px;
+    }
+
+    .empty-sub {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* ── Claim modal (bottom sheet) ──────────────────────── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 9, 8, 0.78);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 50;
+      align-items: flex-end;
+    }
+
+    .overlay.open { display: flex; }
+
+    .sheet {
+      background: var(--faint);
+      border-top: 1px solid var(--border);
+      border-radius: 18px 18px 0 0;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0 20px 32px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0.6; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: var(--smoke);
+      border-radius: 2px;
+      margin: 12px auto 20px;
+    }
+
+    .sheet-top {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+      align-items: flex-start;
+    }
+
+    .sheet-img {
+      width: 76px;
+      height: 96px;
+      border-radius: 7px;
+      object-fit: cover;
+      background: var(--card);
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
+    .sheet-meta { flex: 1; }
+
+    .sheet-brand {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .sheet-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--warm);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .sheet-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .stag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 7px;
+      border-radius: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .stag.price {
+      color: var(--warm);
+      font-weight: 800;
+      font-size: 14px;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    /* Lock notice */
+    .lock-notice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: rgba(201, 169, 110, 0.07);
+      border: 1px solid rgba(201, 169, 110, 0.2);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .lock-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    .lock-notice b { color: var(--gold); font-weight: 700; }
+
+    /* Section label */
+    .slabel {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* Fulfillment options */
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .opt {
+      border: 1px solid var(--border);
+      background: var(--card);
+      border-radius: 9px;
+      padding: 13px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+      text-align: left;
+    }
+
+    .opt.selected {
+      border-color: var(--gold);
+      background: rgba(201, 169, 110, 0.07);
+    }
+
+    .opt-icon { font-size: 18px; margin-bottom: 6px; display: block; }
+    .opt-title { font-size: 13px; font-weight: 700; color: var(--warm); margin-bottom: 2px; }
+    .opt-sub   { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+    /* Contact input */
+    .contact-wrap { margin-bottom: 22px; }
+
+    .contact-input {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--warm);
+      font-size: 14px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .contact-input::placeholder { color: var(--smoke); }
+    .contact-input:focus { border-color: var(--gold); }
+
+    /* CTA button */
+    .cta {
+      width: 100%;
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      border-radius: 9px;
+      padding: 15px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .cta:active {
+      background: var(--gold-d);
+      transform: scale(0.99);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-row">
+      <div class="brand">
+        <span class="live-pip"></span>
+        <span class="brand-name">Archive</span>
+      </div>
+      <span class="drop-tag">Live Drop</span>
+    </div>
+    <!-- Size filter tabs -->
+    <div class="filter-wrap">
+      <div class="filter-scroll" id="filterRow">
+        <button class="fchip active" data-size="ALL">All</button>
+        <button class="fchip" data-size="S">S</button>
+        <button class="fchip" data-size="M">M</button>
+        <button class="fchip" data-size="L">L</button>
+        <button class="fchip" data-size="XL">XL</button>
+        <button class="fchip" data-size="US 9">US 9</button>
+        <button class="fchip" data-size="US 10">US 10</button>
+        <button class="fchip" data-size="US 11">US 11</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <main class="content">
+    <p class="stock-line" id="stockLine">Loading…</p>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <!-- Claim sheet overlay -->
+  <div class="overlay" id="overlay">
+    <div class="sheet" id="sheet">
+      <div class="sheet-handle"></div>
+
+      <div class="sheet-top">
+        <img class="sheet-img" id="sheetImg" src="" alt="">
+        <div class="sheet-meta">
+          <div class="sheet-brand" id="sheetBrand"></div>
+          <div class="sheet-title" id="sheetTitle"></div>
+          <div class="sheet-tags">
+            <span class="stag" id="sheetSize"></span>
+            <span class="stag price" id="sheetPrice"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lock-notice">
+        <span class="lock-icon">⏱</span>
+        <span><b>30-minute hold.</b> Claiming this locks it for you while you arrange payment. If not confirmed, it releases automatically.</span>
+      </div>
+
+      <p class="slabel">Fulfillment</p>
+      <div class="options">
+        <div class="opt selected" id="optPickup" data-v="pickup">
+          <span class="opt-icon">🏬</span>
+          <div class="opt-title">Store Pickup</div>
+          <div class="opt-sub">Collect in boutique — free</div>
+        </div>
+        <div class="opt" id="optDelivery" data-v="delivery">
+          <span class="opt-icon">🚚</span>
+          <div class="opt-title">Delivery</div>
+          <div class="opt-sub">Local courier to you</div>
+        </div>
+      </div>
+
+      <p class="slabel">Contact (optional)</p>
+      <div class="contact-wrap">
+        <input class="contact-input" id="contactInput"
+               type="text" placeholder="@handle or phone number">
+      </div>
+
+      <button class="cta" id="ctaBtn">Lock — 30 min hold</button>
+    </div>
+  </div>
+
+  <script>
+    /* ── Telegram WebApp init ─────────────────────────────── */
+    const tg = window.Telegram?.WebApp;
+    if (tg) { tg.ready(); tg.expand(); }
+
+    /* ── State ───────────────────────────────────────────── */
+    let items        = [];
+    let currentSize  = "ALL";
+    let activeItem   = null;
+    let fulfillment  = "pickup";
+
+    /* ── DOM refs ────────────────────────────────────────── */
+    const grid        = document.getElementById("grid");
+    const stockLine   = document.getElementById("stockLine");
+    const overlay     = document.getElementById("overlay");
+    const optPickup   = document.getElementById("optPickup");
+    const optDelivery = document.getElementById("optDelivery");
+    const ctaBtn      = document.getElementById("ctaBtn");
+
+    /* ── Skeletons while loading ─────────────────────────── */
+    function showSkeletons(n = 6) {
+      grid.innerHTML = Array.from({ length: n }, () => `
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-text">
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line"></div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    /* ── Static fallback inventory (shown when API is unreachable, e.g. GitHub Pages) */
+    const FALLBACK_INVENTORY = [
+      { id:"botz-001", brand:"Nike",         title:"Dunk Low Retro 'Panda'",             size:"US 10", price:"$115", badge:"DEADSTOCK",      badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=85" },
+      { id:"botz-002", brand:"Vintage 1994", title:"Pink Floyd 'Division Bell' Tour Tee", size:"L",     price:"$140", badge:"1-OF-1 VINTAGE", badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=85" },
+      { id:"botz-003", brand:"Arc'teryx",    title:"Beta LT Gore-Tex Shell Jacket",       size:"M",     price:"$320", badge:"GRAIL",          badge_class:"grail",      image_url:"https://images.unsplash.com/photo-1548883354-7622d03aca27?w=600&q=85" },
+      { id:"botz-004", brand:"Stüssy",       title:"8-Ball Mohair Knit Sweater",          size:"L",     price:"$185", badge:"ARCHIVE",        badge_class:"archive",    image_url:"https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=85" },
+      { id:"botz-005", brand:"Carhartt WIP", title:"Detroit Jacket Blanket Lined",        size:"XL",    price:"$160", badge:"1-OF-1",         badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=85" },
+      { id:"botz-006", brand:"Air Jordan",   title:"Jordan 4 Retro 'Military Black'",     size:"US 11", price:"$290", badge:"VERIFIED GRAIL", badge_class:"grail",      image_url:"https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&q=85" },
+      { id:"botz-007", brand:"Supreme",      title:"Box Logo Crewneck (FW22)",            size:"S",     price:"$210", badge:"1-OF-1",         badge_class:"archive",    image_url:"https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=85" },
+      { id:"botz-008", brand:"New Balance",  title:"990v3 MiUSA Grey Classic",            size:"US 9",  price:"$135", badge:"CLEAN PAIR",     badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=85" },
+    ];
+
+    /* ── Fetch live inventory from API, fall back to static data ── */
+    async function loadItems(size = "ALL") {
+      showSkeletons();
+      stockLine.textContent = "Loading…";
+      try {
+        const res = await fetch(`/api/items?size=${encodeURIComponent(size)}`);
+        if (!res.ok) throw new Error("non-ok");
+        const data = await res.json();
+        items = data;
+      } catch {
+        // No live server (GitHub Pages / static hosting) — use fallback data
+        const all = FALLBACK_INVENTORY;
+        items = size === "ALL" ? all : all.filter(i => i.size === size);
+      }
+      renderItems();
+    }
+
+    /* ── Render cards ────────────────────────────────────── */
+    function renderItems() {
+      const count = items.length;
+      stockLine.innerHTML = count > 0
+        ? `<span>${count}</span> piece${count !== 1 ? "s" : ""} available`
+        : "";
+
+      if (count === 0) {
+        grid.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">🕵️</div>
+            <div class="empty-title">Nothing in this size right now</div>
+            <div class="empty-sub">New drops land every Friday.<br>Try another size or check back soon.</div>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = "";
+      items.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="card-img-wrap">
+            <img class="card-img" data-src="${item.image_url || ""}" alt="${item.title}">
+            <span class="badge ${item.badge_class}">${item.badge}</span>
+            <span class="img-size">${item.size}</span>
+            <div class="img-price">
+              <span>${item.price}</span>
+              <span class="claim-btn">Claim</span>
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="card-brand">${item.brand}</div>
+            <div class="card-title">${item.title}</div>
+          </div>
+        `;
+        // Lazy-load image
+        const img = card.querySelector(".card-img");
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(e => {
+            if (e.isIntersecting) {
+              img.src = img.dataset.src;
+              img.addEventListener("load", () => img.classList.add("loaded"), { once: true });
+              observer.disconnect();
+            }
+          });
+        }, { rootMargin: "80px" });
+        observer.observe(img);
+
+        card.addEventListener("click", () => openSheet(item));
+        grid.appendChild(card);
+      });
+    }
+
+    /* ── Size filter ─────────────────────────────────────── */
+    document.getElementById("filterRow").addEventListener("click", e => {
+      const chip = e.target.closest(".fchip");
+      if (!chip) return;
+      document.querySelectorAll(".fchip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      currentSize = chip.dataset.size;
+      loadItems(currentSize);
+    });
+
+    /* ── Claim sheet ─────────────────────────────────────── */
+    function openSheet(item) {
+      activeItem = item;
+      document.getElementById("sheetImg").src    = item.image_url || "";
+      document.getElementById("sheetBrand").textContent = item.brand;
+      document.getElementById("sheetTitle").textContent = item.title;
+      document.getElementById("sheetSize").textContent  = item.size;
+      document.getElementById("sheetPrice").textContent = item.price;
+      document.getElementById("contactInput").value     = "";
+      setFulfillment("pickup");
+      overlay.classList.add("open");
+    }
+
+    function closeSheet() {
+      overlay.classList.remove("open");
+      activeItem = null;
+    }
+
+    overlay.addEventListener("click", e => {
+      if (e.target === overlay) closeSheet();
+    });
+
+    function setFulfillment(val) {
+      fulfillment = val;
+      optPickup.classList.toggle("selected",   val === "pickup");
+      optDelivery.classList.toggle("selected", val === "delivery");
+    }
+
+    optPickup.addEventListener("click",   () => setFulfillment("pickup"));
+    optDelivery.addEventListener("click", () => setFulfillment("delivery"));
+
+    /* ── Confirm claim ───────────────────────────────────── */
+    ctaBtn.addEventListener("click", () => {
+      if (!activeItem) return;
+
+      const payload = {
+        action:      "claim_item",
+        item_id:     activeItem.id,
+        brand:       activeItem.brand,
+        title:       activeItem.title,
+        size:        activeItem.size,
+        price:       activeItem.price,
+        badge_class: activeItem.badge_class,
+        fulfillment: fulfillment,
+        contact:     document.getElementById("contactInput").value.trim() || null,
+        timestamp:   new Date().toISOString(),
+      };
+
+      if (tg && typeof tg.sendData === "function") {
+        tg.sendData(JSON.stringify(payload));
+        tg.close();
+      } else {
+        // Browser demo mode
+        alert(
+          `✅ Claim confirmed!\n\n` +
+          `${activeItem.brand} — ${activeItem.title}\n` +
+          `Size: ${activeItem.size}  ·  ${activeItem.price}\n` +
+          `Fulfillment: ${fulfillment === "pickup" ? "Store Pickup" : "Local Delivery"}\n\n` +
+          `30-minute hold is active.`
+        );
+        closeSheet();
+      }
+    });
+
+    /* ── Boot ────────────────────────────────────────────── */
+    loadItems();
+  </script>
+</body>
+</html>

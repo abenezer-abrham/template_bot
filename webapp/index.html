@@ -666,24 +666,33 @@
       `).join("");
     }
 
-    /* ── Fetch live inventory from API ───────────────────── */
+    /* ── Static fallback inventory (shown when API is unreachable, e.g. GitHub Pages) */
+    const FALLBACK_INVENTORY = [
+      { id:"botz-001", brand:"Nike",         title:"Dunk Low Retro 'Panda'",             size:"US 10", price:"$115", badge:"DEADSTOCK",      badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=85" },
+      { id:"botz-002", brand:"Vintage 1994", title:"Pink Floyd 'Division Bell' Tour Tee", size:"L",     price:"$140", badge:"1-OF-1 VINTAGE", badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=85" },
+      { id:"botz-003", brand:"Arc'teryx",    title:"Beta LT Gore-Tex Shell Jacket",       size:"M",     price:"$320", badge:"GRAIL",          badge_class:"grail",      image_url:"https://images.unsplash.com/photo-1548883354-7622d03aca27?w=600&q=85" },
+      { id:"botz-004", brand:"Stüssy",       title:"8-Ball Mohair Knit Sweater",          size:"L",     price:"$185", badge:"ARCHIVE",        badge_class:"archive",    image_url:"https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=85" },
+      { id:"botz-005", brand:"Carhartt WIP", title:"Detroit Jacket Blanket Lined",        size:"XL",    price:"$160", badge:"1-OF-1",         badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=85" },
+      { id:"botz-006", brand:"Air Jordan",   title:"Jordan 4 Retro 'Military Black'",     size:"US 11", price:"$290", badge:"VERIFIED GRAIL", badge_class:"grail",      image_url:"https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&q=85" },
+      { id:"botz-007", brand:"Supreme",      title:"Box Logo Crewneck (FW22)",            size:"S",     price:"$210", badge:"1-OF-1",         badge_class:"archive",    image_url:"https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=85" },
+      { id:"botz-008", brand:"New Balance",  title:"990v3 MiUSA Grey Classic",            size:"US 9",  price:"$135", badge:"CLEAN PAIR",     badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=85" },
+    ];
+
+    /* ── Fetch live inventory from API, fall back to static data ── */
     async function loadItems(size = "ALL") {
       showSkeletons();
       stockLine.textContent = "Loading…";
       try {
-        const res  = await fetch(`/api/items?size=${encodeURIComponent(size)}`);
+        const res = await fetch(`/api/items?size=${encodeURIComponent(size)}`);
+        if (!res.ok) throw new Error("non-ok");
         const data = await res.json();
         items = data;
-        renderItems();
-      } catch (err) {
-        grid.innerHTML = `
-          <div class="empty" style="grid-column:1/-1">
-            <div class="empty-icon">📡</div>
-            <div class="empty-title">Couldn't load inventory</div>
-            <div class="empty-sub">Check your connection and try again.</div>
-          </div>`;
-        stockLine.textContent = "";
+      } catch {
+        // No live server (GitHub Pages / static hosting) — use fallback data
+        const all = FALLBACK_INVENTORY;
+        items = size === "ALL" ? all : all.filter(i => i.size === size);
       }
+      renderItems();
     }
 
     /* ── Render cards ────────────────────────────────────── */

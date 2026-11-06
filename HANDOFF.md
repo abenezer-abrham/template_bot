@@ -5,7 +5,7 @@ Run: python main.py
 Done:
 - Initialized modular structure and Git repositories
 - Implemented core aiogram 3.x dispatcher with WebApp launcher and callback handlers
-- Finalized business pivot from salon to 1-of-1 boutique/second-hand retail
+- Established 1-of-1 boutique/second-hand retail as the core product model
 - Built Streetwear/Thrift WebApp UI (Grailed/StockX dark aesthetic, "Shop My Size" filter tabs, 1-of-1 scarcity badges, 30-min claim modal with pickup vs delivery)
 - Updated bot handlers and keyboards to handle showroom navigation and 30-min claim order confirmations
 - Added SQLite-first DB layer, then upgraded to asyncpg / Supabase PostgreSQL
