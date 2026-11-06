@@ -3,193 +3,269 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>BOTZ Archive</title>
+  <title>Boutique Showroom // All Departments</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    /* ── Design tokens ───────────────────────────────────── */
+    /* ── Light Retail Palette (Amazon / ASOS inspired) ─────────────── */
     :root {
-      --ink:    #111010;
-      --faint:  #1a1815;
-      --card:   #201e1b;
-      --border: #2e2b27;
-      --smoke:  #3d3a36;
-      --warm:   #f4f0ea;
-      --muted:  #8a8480;
-      --gold:   #c9a96e;
-      --gold-d: #b8955a;
-      --red:    #c0624a;
-      --purple: #8e7ab5;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --card-border: #e5e7eb;
+      --card-hover: #f3f4f6;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-subtle: #94a3b8;
+      --amber: #f59e0b;
+      --amber-dark: #d97706;
+      --amber-light: #fef3c7;
+      --primary: #2563eb;
+      --green: #10b981;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
     }
 
-    /* ── Reset ───────────────────────────────────────────── */
-    *, *::before, *::after {
+    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
 
-    html { height: 100%; }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                   "Helvetica Neue", Arial, sans-serif;
-      background: var(--ink);
-      color: var(--warm);
-      min-height: 100%;
-      line-height: 1.4;
-      overscroll-behavior: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding-bottom: 90px;
     }
 
-    /* ── Header ──────────────────────────────────────────── */
-    .header {
+    /* ── Sticky Navigation Bar ───────────────────────────────────────── */
+    .top-nav {
       position: sticky;
       top: 0;
-      z-index: 10;
-      background: var(--ink);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 16px 0;
+      z-index: 30;
+      background: #ffffff;
+      border-bottom: 1px solid var(--card-border);
+      box-shadow: var(--shadow-sm);
+      padding: 12px 16px 8px;
     }
 
-    .header-row {
+    .nav-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding-bottom: 12px;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
-    .brand {
+    .brand-logo {
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .brand-name {
       font-size: 17px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
+      font-weight: 900;
+      letter-spacing: -0.02em;
       text-transform: uppercase;
-      color: var(--warm);
+      color: var(--text);
     }
 
-    .live-pip {
+    .live-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .live-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: var(--gold);
-      animation: breathe 2.4s ease-in-out infinite;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 1.8s infinite;
     }
 
-    @keyframes breathe {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.3; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.8); opacity: 0.5; }
     }
 
-    .drop-tag {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--gold);
-      border: 1px solid rgba(201, 169, 110, 0.35);
-      padding: 3px 8px;
-      border-radius: 3px;
-    }
-
-    /* ── Size Filter ─────────────────────────────────────── */
-    .filter-wrap {
+    /* ── Search Bar ─────────────────────────────────────────────────── */
+    .search-box {
       position: relative;
-      padding-bottom: 1px;
+      margin-bottom: 10px;
     }
 
-    .filter-scroll {
+    .search-input {
+      width: 100%;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px 10px 38px;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .search-input:focus {
+      background: #ffffff;
+      border-color: var(--amber-dark);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* ── Department Tabs (Horizontal Carousel) ───────────────────────── */
+    .dept-scroll {
       display: flex;
-      gap: 0;
+      gap: 8px;
       overflow-x: auto;
       scrollbar-width: none;
+      padding-bottom: 4px;
     }
 
-    .filter-scroll::-webkit-scrollbar { display: none; }
+    .dept-scroll::-webkit-scrollbar { display: none; }
 
-    .fchip {
+    .dept-pill {
       flex-shrink: 0;
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 600;
-      padding: 10px 14px;
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 7px 13px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 700;
       cursor: pointer;
-      position: relative;
-      transition: color 0.18s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
       white-space: nowrap;
     }
 
-    .fchip::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      width: 0;
-      height: 2px;
-      background: var(--gold);
-      transform: translateX(-50%);
-      transition: width 0.2s ease;
+    .dept-pill:hover {
+      border-color: #94a3b8;
     }
 
-    .fchip.active {
-      color: var(--warm);
+    .dept-pill.active {
+      background: var(--text);
+      color: #ffffff;
+      border-color: var(--text);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
     }
 
-    .fchip.active::after {
-      width: calc(100% - 20px);
+    /* ── Size Quick Filter Bar ───────────────────────────────────────── */
+    .size-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 10px 16px 4px;
     }
 
-    /* ── Main content ────────────────────────────────────── */
-    .content {
-      padding: 16px 12px 100px;
-    }
+    .size-filter-bar::-webkit-scrollbar { display: none; }
 
-    /* ── Stock counter ───────────────────────────────────── */
-    .stock-line {
+    .size-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      margin-bottom: 14px;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-right: 4px;
+      white-space: nowrap;
     }
 
-    .stock-line span {
-      color: var(--gold);
-    }
-
-    /* ── Product grid ────────────────────────────────────── */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    /* ── Product card ────────────────────────────────────── */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
+    .size-chip {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      color: var(--text);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .size-chip.active {
+      background: var(--amber-light);
+      border-color: var(--amber-dark);
+      color: var(--amber-dark);
+      font-weight: 800;
+    }
+
+    /* ── Catalog Stats & Summary ─────────────────────────────────────── */
+    .catalog-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .catalog-summary b {
+      color: var(--text);
+    }
+
+    /* ── Product Grid ────────────────────────────────────────────────── */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 6px 14px 20px;
+    }
+
+    @media (min-width: 650px) {
+      .product-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* ── Product Card (Amazon / ASOS Clean Aesthetic) ─────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      transition: transform 0.14s ease, border-color 0.14s ease;
-      will-change: transform;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     }
 
-    .card:active { transform: scale(0.97); }
+    .card:active {
+      transform: scale(0.98);
+    }
 
     .card-img-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #f1f5f9;
       position: relative;
-      aspect-ratio: 3 / 4;
-      background: var(--faint);
       overflow: hidden;
     }
 
@@ -198,633 +274,595 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      opacity: 0;
       transition: opacity 0.3s ease;
     }
 
-    .card-img.loaded { opacity: 1; }
-
-    /* Gradient at bottom of image so text is readable */
-    .card-img-wrap::after {
-      content: '';
+    .card-badge {
       position: absolute;
-      inset: auto 0 0 0;
-      height: 55%;
-      background: linear-gradient(
-        to top,
-        rgba(17, 16, 16, 0.92) 0%,
-        rgba(17, 16, 16, 0.5)  40%,
-        transparent             100%
-      );
-      pointer-events: none;
-    }
-
-    .badge {
-      position: absolute;
-      top: 9px;
-      left: 9px;
-      z-index: 2;
+      top: 8px;
+      left: 8px;
       font-size: 9px;
       font-weight: 800;
-      letter-spacing: 0.07em;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
       padding: 3px 6px;
-      border-radius: 3px;
-      border: 1px solid;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
     }
 
-    .badge.one-of-one { color: #c0624a; border-color: rgba(192, 98, 74, 0.4); background: rgba(192, 98, 74, 0.12); }
-    .badge.archive    { color: #c9a96e; border-color: rgba(201, 169, 110, 0.4); background: rgba(201, 169, 110, 0.12); }
-    .badge.grail      { color: #8e7ab5; border-color: rgba(142, 122, 181, 0.4); background: rgba(142, 122, 181, 0.12); }
-
-    .img-size {
-      position: absolute;
-      bottom: 50px;
-      left: 9px;
-      z-index: 2;
-      font-size: 10px;
-      font-weight: 700;
-      color: rgba(244, 240, 234, 0.75);
-      letter-spacing: 0.04em;
+    .badge-primary {
+      background: #0f172a;
+      color: #ffffff;
     }
 
-    .img-price {
+    .badge-rare {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .badge-amber {
+      background: var(--amber);
+      color: #0f172a;
+    }
+
+    .size-tag {
       position: absolute;
-      bottom: 32px;
-      left: 9px;
-      right: 9px;
-      z-index: 2;
-      font-size: 15px;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(4px);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 11px;
       font-weight: 800;
-      color: var(--warm);
+      padding: 2px 7px;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-body {
+      padding: 10px 10px 12px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      flex-grow: 1;
       justify-content: space-between;
     }
 
-    .claim-btn {
-      font-size: 10px;
+    .brand-text {
+      font-size: 10.5px;
       font-weight: 800;
-      letter-spacing: 0.06em;
       text-transform: uppercase;
-      background: var(--gold);
-      color: var(--ink);
-      border-radius: 3px;
-      padding: 4px 7px;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
     }
 
-    .card-info {
-      padding: 10px 10px 11px;
-      border-top: 1px solid var(--border);
-    }
-
-    .card-brand {
-      font-size: 10px;
+    .title-text {
+      font-size: 13px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
-
-    .card-title {
-      font-size: 12.5px;
-      font-weight: 500;
-      color: var(--warm);
+      color: var(--text);
       line-height: 1.3;
+      margin-bottom: 5px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      min-height: 34px;
     }
 
-    /* ── Skeleton loading ────────────────────────────────── */
-    .skeleton-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-
-    .skeleton-img {
-      aspect-ratio: 3 / 4;
-      background: linear-gradient(90deg, var(--faint) 25%, var(--border) 50%, var(--faint) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-    }
-
-    .skeleton-text {
-      padding: 10px;
-    }
-
-    .skeleton-line {
-      height: 10px;
-      border-radius: 4px;
-      background: linear-gradient(90deg, var(--faint) 25%, var(--border) 50%, var(--faint) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      margin-bottom: 7px;
-    }
-
-    .skeleton-line.short { width: 60%; }
-
-    @keyframes shimmer {
-      0%   { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    /* ── Empty state ─────────────────────────────────────── */
-    .empty {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 52px 20px;
-      color: var(--muted);
-    }
-
-    .empty-icon {
-      font-size: 32px;
-      margin-bottom: 10px;
-      opacity: 0.5;
-    }
-
-    .empty-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--warm);
+    .rating-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--amber-dark);
+      font-weight: 700;
       margin-bottom: 6px;
     }
 
-    .empty-sub {
-      font-size: 12px;
-      line-height: 1.5;
+    .rating-count {
+      color: var(--text-subtle);
+      font-weight: 500;
     }
 
-    /* ── Claim modal (bottom sheet) ──────────────────────── */
-    .overlay {
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .price-tag {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .claim-action-btn {
+      background: var(--amber);
+      color: #0f172a;
+      border: none;
+      padding: 5px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      box-shadow: 0 1px 2px rgba(245, 158, 11, 0.3);
+    }
+
+    /* ── Empty State ─────────────────────────────────────────────────── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 50px 20px;
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--card-border);
+    }
+
+    .empty-icon { font-size: 36px; margin-bottom: 10px; opacity: 0.6; }
+    .empty-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+    .empty-sub { font-size: 12px; color: var(--text-muted); }
+
+    /* ── Claim Bottom Sheet Modal ────────────────────────────────────── */
+    .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(10, 9, 8, 0.78);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      z-index: 50;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
       align-items: flex-end;
+      justify-content: center;
     }
 
-    .overlay.open { display: flex; }
+    .modal-overlay.open { display: flex; }
 
-    .sheet {
-      background: var(--faint);
-      border-top: 1px solid var(--border);
-      border-radius: 18px 18px 0 0;
+    .modal-sheet {
+      background: #ffffff;
+      border-top-left-radius: var(--radius-lg);
+      border-top-right-radius: var(--radius-lg);
       width: 100%;
       max-width: 520px;
-      margin: 0 auto;
-      padding: 0 20px 32px;
-      max-height: 90vh;
+      padding: 16px 20px 32px;
+      max-height: 88vh;
       overflow-y: auto;
-      animation: slideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.15);
+      animation: sheetUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes slideUp {
-      from { transform: translateY(100%); opacity: 0.6; }
-      to   { transform: translateY(0);    opacity: 1; }
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
 
     .sheet-handle {
-      width: 36px;
+      width: 40px;
       height: 4px;
-      background: var(--smoke);
+      background: #cbd5e1;
       border-radius: 2px;
-      margin: 12px auto 20px;
+      margin: 0 auto 16px;
     }
 
-    .sheet-top {
+    .modal-header-row {
       display: flex;
       gap: 14px;
-      margin-bottom: 18px;
-      align-items: flex-start;
+      margin-bottom: 16px;
     }
 
-    .sheet-img {
-      width: 76px;
-      height: 96px;
-      border-radius: 7px;
+    .modal-thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-sm);
       object-fit: cover;
-      background: var(--card);
+      background: #f1f5f9;
+      border: 1px solid var(--card-border);
       flex-shrink: 0;
-      border: 1px solid var(--border);
     }
 
-    .sheet-meta { flex: 1; }
+    .modal-info { flex: 1; }
+    .modal-brand { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+    .modal-title { font-size: 15px; font-weight: 800; color: var(--text); margin: 2px 0 6px; }
+    .modal-chips { display: flex; gap: 6px; align-items: center; }
+    .modal-chip { font-size: 11px; font-weight: 800; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--card-border); }
+    .modal-price { font-size: 17px; font-weight: 900; color: var(--text); margin-left: auto; }
 
-    .sheet-brand {
+    .hold-alert {
+      background: var(--amber-light);
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      color: #92400e;
+      margin-bottom: 16px;
+    }
+
+    .section-label {
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .sheet-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--warm);
-      line-height: 1.25;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
       margin-bottom: 8px;
     }
 
-    .sheet-tags {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .stag {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 7px;
-      border-radius: 4px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .stag.price {
-      color: var(--warm);
-      font-weight: 800;
-      font-size: 14px;
-      background: none;
-      border: none;
-      padding: 0;
-    }
-
-    /* Lock notice */
-    .lock-notice {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      background: rgba(201, 169, 110, 0.07);
-      border: 1px solid rgba(201, 169, 110, 0.2);
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 20px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    .lock-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
-
-    .lock-notice b { color: var(--gold); font-weight: 700; }
-
-    /* Section label */
-    .slabel {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    /* Fulfillment options */
-    .options {
+    .fulfillment-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
-    .opt {
-      border: 1px solid var(--border);
-      background: var(--card);
-      border-radius: 9px;
-      padding: 13px 12px;
+    .ful-option {
+      border: 1.5px solid var(--card-border);
+      background: #ffffff;
+      padding: 12px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease;
-      text-align: left;
+      transition: all 0.15s ease;
     }
 
-    .opt.selected {
-      border-color: var(--gold);
-      background: rgba(201, 169, 110, 0.07);
+    .ful-option.selected {
+      border-color: var(--amber-dark);
+      background: #fffbeb;
     }
 
-    .opt-icon { font-size: 18px; margin-bottom: 6px; display: block; }
-    .opt-title { font-size: 13px; font-weight: 700; color: var(--warm); margin-bottom: 2px; }
-    .opt-sub   { font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .ful-option h4 { font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .ful-option p { font-size: 11px; color: var(--text-muted); }
 
-    /* Contact input */
-    .contact-wrap { margin-bottom: 22px; }
-
-    .contact-input {
+    .input-field {
       width: 100%;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      color: var(--warm);
+      background: #f8f9fa;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
       font-size: 14px;
-      padding: 12px 14px;
+      color: var(--text);
       outline: none;
-      transition: border-color 0.15s ease;
+      margin-bottom: 18px;
     }
 
-    .contact-input::placeholder { color: var(--smoke); }
-    .contact-input:focus { border-color: var(--gold); }
+    .input-field:focus {
+      border-color: var(--amber-dark);
+      background: #ffffff;
+    }
 
-    /* CTA button */
-    .cta {
+    .modal-confirm-btn {
       width: 100%;
-      background: var(--gold);
-      color: var(--ink);
+      background: var(--amber);
+      color: #0f172a;
       border: none;
-      border-radius: 9px;
-      padding: 15px;
+      padding: 14px;
+      border-radius: var(--radius-sm);
       font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
+      font-weight: 900;
       text-transform: uppercase;
+      letter-spacing: 0.04em;
       cursor: pointer;
-      transition: background 0.15s ease, transform 0.1s ease;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+      transition: background 0.15s ease;
     }
 
-    .cta:active {
-      background: var(--gold-d);
-      transform: scale(0.99);
+    .modal-confirm-btn:active {
+      background: var(--amber-dark);
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="header-row">
-      <div class="brand">
-        <span class="live-pip"></span>
-        <span class="brand-name">Archive</span>
+  <!-- Top Navigation & Brand Header -->
+  <header class="top-nav">
+    <div class="nav-header">
+      <div class="brand-logo">
+        🛍️ BOUTIQUE ARCHIVE
       </div>
-      <span class="drop-tag">Live Drop</span>
+      <div class="live-status">
+        <span class="live-dot"></span>
+        In Stock · 1-of-1
+      </div>
     </div>
-    <!-- Size filter tabs -->
-    <div class="filter-wrap">
-      <div class="filter-scroll" id="filterRow">
-        <button class="fchip active" data-size="ALL">All</button>
-        <button class="fchip" data-size="S">S</button>
-        <button class="fchip" data-size="M">M</button>
-        <button class="fchip" data-size="L">L</button>
-        <button class="fchip" data-size="XL">XL</button>
-        <button class="fchip" data-size="US 9">US 9</button>
-        <button class="fchip" data-size="US 10">US 10</button>
-        <button class="fchip" data-size="US 11">US 11</button>
-      </div>
+
+    <!-- Live Search -->
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search shoes, hoodies, tees, denim, jackets...">
+    </div>
+
+    <!-- Department Carousel -->
+    <div class="dept-scroll" id="deptTabs">
+      <button class="dept-pill active" data-dept="ALL">🔥 All Items</button>
+      <button class="dept-pill" data-dept="shoes">👟 Shoes</button>
+      <button class="dept-pill" data-dept="hoodies">🧥 Hoodies</button>
+      <button class="dept-pill" data-dept="tees">👕 Tees</button>
+      <button class="dept-pill" data-dept="jackets">🥼 Jackets</button>
+      <button class="dept-pill" data-dept="pants">👖 Pants</button>
+      <button class="dept-pill" data-dept="accessories">🧢 Accessories</button>
     </div>
   </header>
 
-  <!-- Content -->
-  <main class="content">
-    <p class="stock-line" id="stockLine">Loading…</p>
-    <div class="grid" id="grid"></div>
-  </main>
+  <!-- Size Quick Filters -->
+  <div class="size-filter-bar" id="sizeFilters">
+    <span class="size-label">Size:</span>
+    <button class="size-chip active" data-size="ALL">All Sizes</button>
+    <button class="size-chip" data-size="S">S</button>
+    <button class="size-chip" data-size="M">M</button>
+    <button class="size-chip" data-size="L">L</button>
+    <button class="size-chip" data-size="XL">XL</button>
+    <button class="size-chip" data-size="US 9">US 9</button>
+    <button class="size-chip" data-size="US 10">US 10</button>
+    <button class="size-chip" data-size="US 11">US 11</button>
+    <button class="size-chip" data-size="32 / 32">32x32</button>
+  </div>
 
-  <!-- Claim sheet overlay -->
-  <div class="overlay" id="overlay">
-    <div class="sheet" id="sheet">
+  <!-- Catalog Summary -->
+  <div class="catalog-summary">
+    <span id="catalogCount">Showing <b>24</b> available pieces</span>
+    <span>⚡ Instant 30-min hold</span>
+  </div>
+
+  <!-- Product Grid -->
+  <main class="product-grid" id="productGrid"></main>
+
+  <!-- Claim Sheet Modal -->
+  <div class="modal-overlay" id="claimModal">
+    <div class="modal-sheet">
       <div class="sheet-handle"></div>
 
-      <div class="sheet-top">
-        <img class="sheet-img" id="sheetImg" src="" alt="">
-        <div class="sheet-meta">
-          <div class="sheet-brand" id="sheetBrand"></div>
-          <div class="sheet-title" id="sheetTitle"></div>
-          <div class="sheet-tags">
-            <span class="stag" id="sheetSize"></span>
-            <span class="stag price" id="sheetPrice"></span>
+      <div class="modal-header-row">
+        <img id="modalImg" class="modal-thumb" src="" alt="Item">
+        <div class="modal-info">
+          <div id="modalBrand" class="modal-brand">BRAND</div>
+          <div id="modalTitle" class="modal-title">Item Title</div>
+          <div class="modal-chips">
+            <span id="modalSize" class="modal-chip">SIZE</span>
+            <span id="modalBadge" class="modal-chip">1-OF-1</span>
+            <span id="modalPrice" class="modal-price">$0</span>
           </div>
         </div>
       </div>
 
-      <div class="lock-notice">
-        <span class="lock-icon">⏱</span>
-        <span><b>30-minute hold.</b> Claiming this locks it for you while you arrange payment. If not confirmed, it releases automatically.</span>
+      <div class="hold-alert">
+        <span>⏱️</span>
+        <span><b>30-Minute Instant Lock:</b> Claiming reserves this exact piece so nobody else can take it while you finalize payment in Telegram.</span>
       </div>
 
-      <p class="slabel">Fulfillment</p>
-      <div class="options">
-        <div class="opt selected" id="optPickup" data-v="pickup">
-          <span class="opt-icon">🏬</span>
-          <div class="opt-title">Store Pickup</div>
-          <div class="opt-sub">Collect in boutique — free</div>
+      <div class="section-label">Choose Fulfillment</div>
+      <div class="fulfillment-grid">
+        <div class="ful-option selected" id="optPickup" data-val="pickup">
+          <h4>🏬 Store Pickup</h4>
+          <p>Collect at boutique (Free hold)</p>
         </div>
-        <div class="opt" id="optDelivery" data-v="delivery">
-          <span class="opt-icon">🚚</span>
-          <div class="opt-title">Delivery</div>
-          <div class="opt-sub">Local courier to you</div>
+        <div class="ful-option" id="optDelivery" data-val="delivery">
+          <h4>🚚 Courier Delivery</h4>
+          <p>Local express to your door</p>
         </div>
       </div>
 
-      <p class="slabel">Contact (optional)</p>
-      <div class="contact-wrap">
-        <input class="contact-input" id="contactInput"
-               type="text" placeholder="@handle or phone number">
-      </div>
+      <div class="section-label">Contact / Delivery Address (Optional)</div>
+      <input type="text" id="contactInput" class="input-field" placeholder="@username, phone or delivery street address">
 
-      <button class="cta" id="ctaBtn">Lock — 30 min hold</button>
+      <button class="modal-confirm-btn" id="btnConfirmClaim">Lock Piece for 30 Min</button>
     </div>
   </div>
 
   <script>
-    /* ── Telegram WebApp init ─────────────────────────────── */
+    // Initialize Telegram WebApp
     const tg = window.Telegram?.WebApp;
-    if (tg) { tg.ready(); tg.expand(); }
-
-    /* ── State ───────────────────────────────────────────── */
-    let items        = [];
-    let currentSize  = "ALL";
-    let activeItem   = null;
-    let fulfillment  = "pickup";
-
-    /* ── DOM refs ────────────────────────────────────────── */
-    const grid        = document.getElementById("grid");
-    const stockLine   = document.getElementById("stockLine");
-    const overlay     = document.getElementById("overlay");
-    const optPickup   = document.getElementById("optPickup");
-    const optDelivery = document.getElementById("optDelivery");
-    const ctaBtn      = document.getElementById("ctaBtn");
-
-    /* ── Skeletons while loading ─────────────────────────── */
-    function showSkeletons(n = 6) {
-      grid.innerHTML = Array.from({ length: n }, () => `
-        <div class="skeleton-card">
-          <div class="skeleton-img"></div>
-          <div class="skeleton-text">
-            <div class="skeleton-line short"></div>
-            <div class="skeleton-line"></div>
-          </div>
-        </div>
-      `).join("");
+    if (tg) {
+      tg.ready();
+      tg.expand();
     }
 
-    /* ── Static fallback inventory (shown when API is unreachable, e.g. GitHub Pages) */
-    const FALLBACK_INVENTORY = [
-      { id:"botz-001", brand:"Nike",         title:"Dunk Low Retro 'Panda'",             size:"US 10", price:"$115", badge:"DEADSTOCK",      badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=85" },
-      { id:"botz-002", brand:"Vintage 1994", title:"Pink Floyd 'Division Bell' Tour Tee", size:"L",     price:"$140", badge:"1-OF-1 VINTAGE", badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=85" },
-      { id:"botz-003", brand:"Arc'teryx",    title:"Beta LT Gore-Tex Shell Jacket",       size:"M",     price:"$320", badge:"GRAIL",          badge_class:"grail",      image_url:"https://images.unsplash.com/photo-1548883354-7622d03aca27?w=600&q=85" },
-      { id:"botz-004", brand:"Stüssy",       title:"8-Ball Mohair Knit Sweater",          size:"L",     price:"$185", badge:"ARCHIVE",        badge_class:"archive",    image_url:"https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=85" },
-      { id:"botz-005", brand:"Carhartt WIP", title:"Detroit Jacket Blanket Lined",        size:"XL",    price:"$160", badge:"1-OF-1",         badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=85" },
-      { id:"botz-006", brand:"Air Jordan",   title:"Jordan 4 Retro 'Military Black'",     size:"US 11", price:"$290", badge:"VERIFIED GRAIL", badge_class:"grail",      image_url:"https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&q=85" },
-      { id:"botz-007", brand:"Supreme",      title:"Box Logo Crewneck (FW22)",            size:"S",     price:"$210", badge:"1-OF-1",         badge_class:"archive",    image_url:"https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=85" },
-      { id:"botz-008", brand:"New Balance",  title:"990v3 MiUSA Grey Classic",            size:"US 9",  price:"$135", badge:"CLEAN PAIR",     badge_class:"one-of-one", image_url:"https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=85" },
+    // Comprehensive 24-piece inventory across all departments
+    const CATALOG = [
+      // Footwear
+      { id:"botz-shoe-01", category:"shoes", brand:"Nike", title:"Dunk Low Retro 'Panda' Black/White", size:"US 10", price:"$115", badge:"DEADSTOCK", badgeClass:"badge-primary", rating:"4.9", reviews:"142", image:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=85" },
+      { id:"botz-shoe-02", category:"shoes", brand:"Air Jordan", title:"Air Jordan 4 Retro 'Military Black'", size:"US 11", price:"$295", badge:"VERIFIED GRAIL", badgeClass:"badge-rare", rating:"5.0", reviews:"89", image:"https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&q=85" },
+      { id:"botz-shoe-03", category:"shoes", brand:"New Balance", title:"990v3 MiUSA Grey Classic Heritage", size:"US 9", price:"$145", badge:"CLEAN 9.5/10", badgeClass:"badge-primary", rating:"4.8", reviews:"64", image:"https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=85" },
+      { id:"botz-shoe-04", category:"shoes", brand:"Salomon", title:"XT-6 Advanced Black / Phantom Edition", size:"US 10.5", price:"$175", badge:"HOT DROP", badgeClass:"badge-amber", rating:"4.9", reviews:"51", image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=85" },
+
+      // Hoodies & Sweats
+      { id:"botz-hood-01", category:"hoodies", brand:"Stüssy", title:"8-Ball Mohair Knit Crewneck Sweater", size:"L", price:"$185", badge:"ARCHIVE", badgeClass:"badge-rare", rating:"4.9", reviews:"78", image:"https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&q=85" },
+      { id:"botz-hood-02", category:"hoodies", brand:"Supreme", title:"Heavyweight Box Logo Hooded Sweatshirt (FW22)", size:"M", price:"$240", badge:"1-OF-1 PIECE", badgeClass:"badge-rare", rating:"5.0", reviews:"116", image:"https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=85" },
+      { id:"botz-hood-03", category:"hoodies", brand:"Fear of God Essentials", title:"Oversized Fleece Pullover Hoodie Oatmeal", size:"XL", price:"$110", badge:"BESTSELLER", badgeClass:"badge-primary", rating:"4.8", reviews:"93", image:"https://images.unsplash.com/photo-1509967419530-da38b4704bc6?w=600&q=85" },
+      { id:"botz-hood-04", category:"hoodies", brand:"Champion Reverse Weave", title:"Vintage 90s Heather Grey College Hoodie", size:"L", price:"$85", badge:"VINTAGE", badgeClass:"badge-amber", rating:"4.7", reviews:"38", image:"https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=600&q=85" },
+
+      // Tees & Tops
+      { id:"botz-tee-01", category:"tees", brand:"Vintage 1994", title:"Pink Floyd 'Division Bell' World Tour Tee", size:"L", price:"$140", badge:"1-OF-1 VINTAGE", badgeClass:"badge-rare", rating:"5.0", reviews:"42", image:"https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=85" },
+      { id:"botz-tee-02", category:"tees", brand:"Comme des Garçons Play", title:"Double Red Heart Stripe Long-Sleeve Tee", size:"M", price:"$95", badge:"EXCELLENT 9/10", badgeClass:"badge-primary", rating:"4.8", reviews:"67", image:"https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=85" },
+      { id:"botz-tee-03", category:"tees", brand:"Harley-Davidson 3D", title:"1997 Eagle Lightning Faded Washed Tee", size:"XL", price:"$125", badge:"RARE WASH", badgeClass:"badge-amber", rating:"4.9", reviews:"29", image:"https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=600&q=85" },
+      { id:"botz-tee-04", category:"tees", brand:"Ralph Lauren", title:"Custom Slim-Fit Oxford Piqué Polo Navy", size:"S", price:"$55", badge:"MINT CONDITION", badgeClass:"badge-primary", rating:"4.7", reviews:"84", image:"https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=600&q=85" },
+
+      // Jackets & Outerwear
+      { id:"botz-jack-01", category:"jackets", brand:"Arc'teryx", title:"Beta LT Gore-Tex Shell Mountain Jacket", size:"M", price:"$320", badge:"GRAIL SHELL", badgeClass:"badge-rare", rating:"5.0", reviews:"98", image:"https://images.unsplash.com/photo-1548883354-7622d03aca27?w=600&q=85" },
+      { id:"botz-jack-02", category:"jackets", brand:"Carhartt WIP", title:"Detroit Duck Canvas Blanket-Lined Jacket", size:"XL", price:"$165", badge:"WORKWEAR ICON", badgeClass:"badge-primary", rating:"4.9", reviews:"153", image:"https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=85" },
+      { id:"botz-jack-03", category:"jackets", brand:"The North Face", title:"1996 Retro Nuptse 700-Fill Down Puffer", size:"L", price:"$210", badge:"PRIME WARMTH", badgeClass:"badge-primary", rating:"4.9", reviews:"210", image:"https://images.unsplash.com/photo-1544441893-675973e31985?w=600&q=85" },
+      { id:"botz-jack-04", category:"jackets", brand:"Schott NYC", title:"Classic Steerhide Leather Biker Jacket", size:"L", price:"$420", badge:"LIFETIME GRAIL", badgeClass:"badge-rare", rating:"5.0", reviews:"47", image:"https://images.unsplash.com/photo-1520975916090-3105956dac38?w=600&q=85" },
+
+      // Pants & Denim
+      { id:"botz-pant-01", category:"pants", brand:"Carhartt WIP", title:"Double Knee Canvas Work Pant Hamilton Brown", size:"32 / 32", price:"$125", badge:"DOUBLE KNEE", badgeClass:"badge-primary", rating:"4.9", reviews:"76", image:"https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=85" },
+      { id:"botz-pant-02", category:"pants", brand:"Levi's Vintage", title:"1954 501Z Selvedge Raw Rigid Denim", size:"34 / 32", price:"$175", badge:"SELVEDGE", badgeClass:"badge-rare", rating:"4.9", reviews:"61", image:"https://images.unsplash.com/photo-1542272604-780c96856592?w=600&q=85" },
+      { id:"botz-pant-03", category:"pants", brand:"Dickies 874", title:"Original Fit Work Trousers Lincoln Green", size:"30 / 30", price:"$50", badge:"DEADSTOCK", badgeClass:"badge-primary", rating:"4.7", reviews:"119", image:"https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=600&q=85" },
+      { id:"botz-pant-04", category:"pants", brand:"Needles", title:"Poly Smooth Butterfly Track Pants Eggplant", size:"M", price:"$195", badge:"JAPAN ARCHIVE", badgeClass:"badge-amber", rating:"4.8", reviews:"34", image:"https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=600&q=85" },
+
+      // Accessories
+      { id:"botz-acc-01", category:"accessories", brand:"Prada", title:"Re-Nylon Triangle Logo Crossbody Messenger", size:"One Size", price:"$380", badge:"AUTHENTIC LUXURY", badgeClass:"badge-rare", rating:"5.0", reviews:"52", image:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=85" },
+      { id:"botz-acc-02", category:"accessories", brand:"New Era x MoMA", title:"NY Yankees 59FIFTY Fitted Cap Black/White", size:"7 3/8", price:"$65", badge:"LIMITED EDITION", badgeClass:"badge-primary", rating:"4.9", reviews:"88", image:"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&q=85" },
+      { id:"botz-acc-03", category:"accessories", brand:"Ray-Ban", title:"Wayfarer Classic Polarized Black Acetate", size:"Standard", price:"$110", badge:"POLARIZED", badgeClass:"badge-primary", rating:"4.8", reviews:"140", image:"https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=600&q=85" },
+      { id:"botz-acc-04", category:"accessories", brand:"Porter Yoshida & Co.", title:"Tanker 2-Way Helmet Travel Tote Sage Green", size:"One Size", price:"$220", badge:"MADE IN JAPAN", badgeClass:"badge-amber", rating:"4.9", reviews:"31", image:"https://images.unsplash.com/photo-1547949003-9792a18a2601?w=600&q=85" }
     ];
 
-    /* ── Fetch live inventory from API, fall back to static data ── */
-    async function loadItems(size = "ALL") {
-      showSkeletons();
-      stockLine.textContent = "Loading…";
-      try {
-        const res = await fetch(`/api/items?size=${encodeURIComponent(size)}`);
-        if (!res.ok) throw new Error("non-ok");
-        const data = await res.json();
-        items = data;
-      } catch {
-        // No live server (GitHub Pages / static hosting) — use fallback data
-        const all = FALLBACK_INVENTORY;
-        items = size === "ALL" ? all : all.filter(i => i.size === size);
-      }
-      renderItems();
-    }
+    let currentDept = "ALL";
+    let currentSize = "ALL";
+    let searchQuery = "";
+    let selectedItem = null;
+    let selectedFulfillment = "pickup";
 
-    /* ── Render cards ────────────────────────────────────── */
-    function renderItems() {
-      const count = items.length;
-      stockLine.innerHTML = count > 0
-        ? `<span>${count}</span> piece${count !== 1 ? "s" : ""} available`
-        : "";
+    const productGrid = document.getElementById("productGrid");
+    const catalogCount = document.getElementById("catalogCount");
+    const searchInput = document.getElementById("searchInput");
+    const claimModal = document.getElementById("claimModal");
+    const optPickup = document.getElementById("optPickup");
+    const optDelivery = document.getElementById("optDelivery");
+    const btnConfirmClaim = document.getElementById("btnConfirmClaim");
 
-      if (count === 0) {
-        grid.innerHTML = `
-          <div class="empty">
-            <div class="empty-icon">🕵️</div>
-            <div class="empty-title">Nothing in this size right now</div>
-            <div class="empty-sub">New drops land every Friday.<br>Try another size or check back soon.</div>
-          </div>`;
+    function renderProducts() {
+      productGrid.innerHTML = "";
+      const q = searchQuery.toLowerCase().trim();
+
+      const filtered = CATALOG.filter(item => {
+        // Department filter
+        if (currentDept !== "ALL" && item.category !== currentDept) return false;
+        // Size filter
+        if (currentSize !== "ALL" && item.size !== currentSize) return false;
+        // Search filter
+        if (q) {
+          const match = item.brand.toLowerCase().includes(q) ||
+                        item.title.toLowerCase().includes(q) ||
+                        item.size.toLowerCase().includes(q) ||
+                        item.badge.toLowerCase().includes(q);
+          if (!match) return false;
+        }
+        return true;
+      });
+
+      catalogCount.innerHTML = `Showing <b>${filtered.length}</b> available piece${filtered.length !== 1 ? 's' : ''}`;
+
+      if (filtered.length === 0) {
+        productGrid.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔎</div>
+            <div class="empty-title">No matching pieces found</div>
+            <div class="empty-sub">Try adjusting your search terms or clearing the size filter.</div>
+          </div>
+        `;
         return;
       }
 
-      grid.innerHTML = "";
-      items.forEach(item => {
+      filtered.forEach(item => {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <div class="card-img-wrap">
-            <img class="card-img" data-src="${item.image_url || ""}" alt="${item.title}">
-            <span class="badge ${item.badge_class}">${item.badge}</span>
-            <span class="img-size">${item.size}</span>
-            <div class="img-price">
-              <span>${item.price}</span>
-              <span class="claim-btn">Claim</span>
+            <img class="card-img" src="${item.image}" alt="${item.title}" loading="lazy">
+            <span class="card-badge ${item.badgeClass}">${item.badge}</span>
+            <span class="size-tag">${item.size}</span>
+          </div>
+          <div class="card-body">
+            <div>
+              <div class="brand-text">${item.brand}</div>
+              <div class="title-text">${item.title}</div>
+              <div class="rating-row">
+                <span>★</span><span>${item.rating}</span>
+                <span class="rating-count">(${item.reviews})</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <span class="price-tag">${item.price}</span>
+              <button class="claim-action-btn">Claim</button>
             </div>
           </div>
-          <div class="card-info">
-            <div class="card-brand">${item.brand}</div>
-            <div class="card-title">${item.title}</div>
-          </div>
         `;
-        // Lazy-load image
-        const img = card.querySelector(".card-img");
-        const observer = new IntersectionObserver(entries => {
-          entries.forEach(e => {
-            if (e.isIntersecting) {
-              img.src = img.dataset.src;
-              img.addEventListener("load", () => img.classList.add("loaded"), { once: true });
-              observer.disconnect();
-            }
-          });
-        }, { rootMargin: "80px" });
-        observer.observe(img);
 
-        card.addEventListener("click", () => openSheet(item));
-        grid.appendChild(card);
+        card.addEventListener("click", () => openModal(item));
+        productGrid.appendChild(card);
       });
     }
 
-    /* ── Size filter ─────────────────────────────────────── */
-    document.getElementById("filterRow").addEventListener("click", e => {
-      const chip = e.target.closest(".fchip");
+    // Search input handler
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      renderProducts();
+    });
+
+    // Department tabs handler
+    document.getElementById("deptTabs").addEventListener("click", (e) => {
+      const pill = e.target.closest(".dept-pill");
+      if (!pill) return;
+      document.querySelectorAll(".dept-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      currentDept = pill.dataset.dept;
+      renderProducts();
+    });
+
+    // Size filter handler
+    document.getElementById("sizeFilters").addEventListener("click", (e) => {
+      const chip = e.target.closest(".size-chip");
       if (!chip) return;
-      document.querySelectorAll(".fchip").forEach(c => c.classList.remove("active"));
+      document.querySelectorAll(".size-chip").forEach(c => c.classList.remove("active"));
       chip.classList.add("active");
       currentSize = chip.dataset.size;
-      loadItems(currentSize);
+      renderProducts();
     });
 
-    /* ── Claim sheet ─────────────────────────────────────── */
-    function openSheet(item) {
-      activeItem = item;
-      document.getElementById("sheetImg").src    = item.image_url || "";
-      document.getElementById("sheetBrand").textContent = item.brand;
-      document.getElementById("sheetTitle").textContent = item.title;
-      document.getElementById("sheetSize").textContent  = item.size;
-      document.getElementById("sheetPrice").textContent = item.price;
-      document.getElementById("contactInput").value     = "";
-      setFulfillment("pickup");
-      overlay.classList.add("open");
+    // Modal Sheet Handlers
+    function openModal(item) {
+      selectedItem = item;
+      document.getElementById("modalImg").src = item.image;
+      document.getElementById("modalBrand").innerText = item.brand;
+      document.getElementById("modalTitle").innerText = item.title;
+      document.getElementById("modalSize").innerText = `SIZE: ${item.size}`;
+      document.getElementById("modalBadge").innerText = item.badge;
+      document.getElementById("modalPrice").innerText = item.price;
+      document.getElementById("contactInput").value = "";
+      claimModal.classList.add("open");
     }
 
-    function closeSheet() {
-      overlay.classList.remove("open");
-      activeItem = null;
+    function closeModal() {
+      claimModal.classList.remove("open");
+      selectedItem = null;
     }
 
-    overlay.addEventListener("click", e => {
-      if (e.target === overlay) closeSheet();
+    claimModal.addEventListener("click", (e) => {
+      if (e.target === claimModal) closeModal();
     });
 
-    function setFulfillment(val) {
-      fulfillment = val;
-      optPickup.classList.toggle("selected",   val === "pickup");
-      optDelivery.classList.toggle("selected", val === "delivery");
-    }
+    // Fulfillment toggles
+    optPickup.addEventListener("click", () => {
+      selectedFulfillment = "pickup";
+      optPickup.classList.add("selected");
+      optDelivery.classList.remove("selected");
+    });
 
-    optPickup.addEventListener("click",   () => setFulfillment("pickup"));
-    optDelivery.addEventListener("click", () => setFulfillment("delivery"));
+    optDelivery.addEventListener("click", () => {
+      selectedFulfillment = "delivery";
+      optDelivery.classList.add("selected");
+      optPickup.classList.remove("selected");
+    });
 
-    /* ── Confirm claim ───────────────────────────────────── */
-    ctaBtn.addEventListener("click", () => {
-      if (!activeItem) return;
+    // Confirm Claim & send data back to Bot
+    btnConfirmClaim.addEventListener("click", () => {
+      if (!selectedItem) return;
 
       const payload = {
-        action:      "claim_item",
-        item_id:     activeItem.id,
-        brand:       activeItem.brand,
-        title:       activeItem.title,
-        size:        activeItem.size,
-        price:       activeItem.price,
-        badge_class: activeItem.badge_class,
-        fulfillment: fulfillment,
-        contact:     document.getElementById("contactInput").value.trim() || null,
-        timestamp:   new Date().toISOString(),
+        action: "claim_item",
+        item_id: selectedItem.id,
+        brand: selectedItem.brand,
+        title: selectedItem.title,
+        size: selectedItem.size,
+        price: selectedItem.price,
+        fulfillment: selectedFulfillment,
+        contact: document.getElementById("contactInput").value.trim() || "N/A",
+        timestamp: new Date().toISOString()
       };
 
       if (tg && typeof tg.sendData === "function") {
         tg.sendData(JSON.stringify(payload));
         tg.close();
       } else {
-        // Browser demo mode
-        alert(
-          `✅ Claim confirmed!\n\n` +
-          `${activeItem.brand} — ${activeItem.title}\n` +
-          `Size: ${activeItem.size}  ·  ${activeItem.price}\n` +
-          `Fulfillment: ${fulfillment === "pickup" ? "Store Pickup" : "Local Delivery"}\n\n` +
-          `30-minute hold is active.`
-        );
-        closeSheet();
+        alert(`[Demo Mode] Reserved!\n\n${selectedItem.brand} — ${selectedItem.title}\nSize: ${selectedItem.size}  |  ${selectedItem.price}\nFulfillment: ${selectedFulfillment.toUpperCase()}\n\n30-minute hold initiated.`);
+        closeModal();
       }
     });
 
-    /* ── Boot ────────────────────────────────────────────── */
-    loadItems();
+    // Initial render
+    renderProducts();
   </script>
 </body>
 </html>

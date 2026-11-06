@@ -5,17 +5,22 @@ from config import WEBAPP_URL
 
 def main_menu():
     kb = InlineKeyboardBuilder()
-    kb.button(text="🔥 Open Showroom (1-of-1)", web_app=WebAppInfo(url=WEBAPP_URL))
+    # Prominent Full Catalog Launch Button
+    kb.button(text="🛍️ Open Store (All Departments)", web_app=WebAppInfo(url=WEBAPP_URL))
+    kb.button(text="👟 Shoes", web_app=WebAppInfo(url=WEBAPP_URL))
+    kb.button(text="🧥 Hoodies & Tees", web_app=WebAppInfo(url=WEBAPP_URL))
     kb.button(text="⏱️ How 30-Min Lock Works", callback_data="claims_info")
-    kb.button(text="📍 Boutique & Drop Location", callback_data="store_info")
-    kb.adjust(1)
+    kb.button(text="📍 Boutique & Store Details", callback_data="store_info")
+    kb.adjust(1, 2, 2)
     return kb.as_markup()
 
 
 def showroom_keyboard():
     return ReplyKeyboardMarkup(
-        keyboard=[[KeyboardButton(text="🔥 Open Showroom",
-                                  web_app=WebAppInfo(url=WEBAPP_URL))]],
+        keyboard=[
+            [KeyboardButton(text="🛍️ Open Boutique Store", web_app=WebAppInfo(url=WEBAPP_URL))],
+            [KeyboardButton(text="📍 Hours & Location", callback_data="store_info")]
+        ],
         resize_keyboard=True
     )
 
